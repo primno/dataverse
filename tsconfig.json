@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "experimentalDecorators": true,
+    "outDir": "build",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "sourceMap": true
+  },
+  "compileOnSave": true,
+  "include": [
+    "src"
+  ]
+}
