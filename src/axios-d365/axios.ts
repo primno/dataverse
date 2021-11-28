@@ -3,7 +3,7 @@ import { AuthenticationType, ConnectionStringProcessor } from "../connnection-st
 import { HttpsAgentWithRootCA } from "./https-agent";
 import { createNtlmClient } from "./auth/ntlm";
 import { createOAuthClient } from "./auth/oauth";
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 export async function createAxiosClient(connectionString: string) {
     const connectionStringProcessor = new ConnectionStringProcessor(connectionString);
@@ -11,7 +11,8 @@ export async function createAxiosClient(connectionString: string) {
         baseURL: connectionStringProcessor.serviceUri,
         httpsAgent: new HttpsAgentWithRootCA({ keepAlive: true }),
         httpAgent: new http.Agent({ keepAlive: true }),
-    };
+        //validateStatus: () => true
+    } as AxiosRequestConfig;
 
     switch (connectionStringProcessor.authType) {
         case AuthenticationType.AD:     return createNtlmClient(connectionStringProcessor, axiosConfig);
