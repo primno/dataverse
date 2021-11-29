@@ -1,6 +1,25 @@
-import { AuthenticationResult, ConfidentialClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
+import { AuthenticationResult, CacheOptions, ConfidentialClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
+import { DataProtectionScope, Environment, PersistenceCachePlugin, PersistenceCreator } from "@azure/msal-node-extensions";
+import path from "path";
 import { OAuth2Credentials } from "..";
 import { AxiosNetworkModule } from "./axios-network-module";
+
+async function getCacheOptions(): Promise<CacheOptions> {
+    // TODO: Set a correct cache path
+    const cachePath = path.join(Environment.getUserRootDirectory(), "./Primno/cache.json");
+
+    const persistenceConfiguration = {
+        cachePath,
+        dataProtectionScope: DataProtectionScope.CurrentUser,
+        usePlaintextFileOnLinux: false,
+    };
+
+    const persistence = await PersistenceCreator.createPersistence(persistenceConfiguration);
+
+    return {
+        cachePlugin: new PersistenceCachePlugin(persistence)
+    };
+}
 
 export async function getToken(credentials: OAuth2Credentials) {
     const client = new PublicClientApplication({
@@ -19,7 +38,8 @@ export async function getToken(credentials: OAuth2Credentials) {
                 logLevel: LogLevel.Verbose,
                 piiLoggingEnabled: false
             }
-        }
+        },
+        cache: await getCacheOptions()
     });
 
     let result: AuthenticationResult | null;
@@ -31,11 +51,18 @@ export async function getToken(credentials: OAuth2Credentials) {
             });
             break;*/
         case "password":
-            result = await client.acquireTokenByUsernamePassword({
-                scopes: [credentials.scope as string],
-                username: credentials.username,
-                password: credentials.password
-            });
+            try {
+                const tokenCache = client.getTokenCache();
+                const account = (await tokenCache.getAllAccounts())[0];
+                result = await client.acquireTokenSilent({ scopes: [credentials.scope as string], account: account });
+            }
+            catch(except) {
+                result = await client.acquireTokenByUsernamePassword({
+                    scopes: [credentials.scope as string],
+                    username: credentials.username,
+                    password: credentials.password
+                });
+            }
             break;
         default: throw new Error("Invalid grant type");
     }
