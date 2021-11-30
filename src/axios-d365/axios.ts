@@ -4,8 +4,9 @@ import { HttpsAgentWithRootCA } from "./https-agent";
 import { createNtlmClient } from "./auth/ntlm";
 import { createOAuthClient } from "./auth/oauth";
 import axios, { AxiosRequestConfig } from "axios";
+import { D365ClientOptions } from "../d365-client";
 
-export async function createAxiosClient(connectionString: string) {
+export async function createAxiosClient(connectionString: string, options: D365ClientOptions) {
     const connectionStringProcessor = new ConnectionStringProcessor(connectionString);
     const axiosConfig = {
         baseURL: connectionStringProcessor.serviceUri,
@@ -16,7 +17,7 @@ export async function createAxiosClient(connectionString: string) {
 
     switch (connectionStringProcessor.authType) {
         case AuthenticationType.AD:     return createNtlmClient(connectionStringProcessor, axiosConfig);
-        case AuthenticationType.OAuth:  return await createOAuthClient(connectionStringProcessor, axiosConfig);
+        case AuthenticationType.OAuth:  return await createOAuthClient(connectionStringProcessor, axiosConfig, options.cacheDirectory);
 
         default: return axios.create(axiosConfig);
     }

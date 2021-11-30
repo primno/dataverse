@@ -1,3 +1,4 @@
+import { Environment } from "@azure/msal-node-extensions";
 import { AxiosInstance, Method, AxiosResponse, AxiosError } from "axios";
 import { createAxiosClient } from "./axios-d365";
 import { isNullOrEmpty, isNullOrUndefined } from "./common";
@@ -12,12 +13,21 @@ export interface ErrorResponse {
     message: string;
 }
 
+export interface D365ClientOptions {
+    cacheDirectory: string;
+}
+
 export class D365Client {
     private axiosClient: AxiosInstance | Promise<AxiosInstance>;
-    private apiBaseUrl = "api/data/v9.0/";
+    private apiVersion = "v9.0";
+    private apiBaseUrl = `api/data/${this.apiVersion}/`;
+    private options: D365ClientOptions;
 
-    public constructor(connectionString: string) {
-        this.axiosClient = createAxiosClient(connectionString);
+    public constructor(connectionString: string, options?: D365ClientOptions) {
+        this.options = {
+            cacheDirectory: options?.cacheDirectory ?? Environment.getUserRootDirectory()
+        };
+        this.axiosClient = createAxiosClient(connectionString, this.options);
     }
 
     private async getAxiosClient() {

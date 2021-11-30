@@ -18,22 +18,22 @@ export interface OAuth2Credentials {
     scope?: string;
 }
 
-export async function createOAuthClient(connectionStringProcessor: ConnectionStringProcessor, axiosConfig: AxiosRequestConfig) {
+export async function createOAuthClient(connectionStringProcessor: ConnectionStringProcessor, axiosConfig: AxiosRequestConfig, cacheDirectory: string) {
     let authority = await discoverAuthority(connectionStringProcessor, axiosConfig);
     const credentials = convertToOAuth2Credential(connectionStringProcessor, authority, connectionStringProcessor.isOnline == true);
 
     if (connectionStringProcessor.isOnline) {
-        return createMsalClient(credentials, axiosConfig);
+        return createMsalClient(credentials, axiosConfig, cacheDirectory);
     }
     else {
         return createAdfsOAuthClient(credentials, axiosConfig);
     }
 }
 
-function createMsalClient(credentials: OAuth2Credentials, axiosConfig: AxiosRequestConfig): AxiosInstance {
+function createMsalClient(credentials: OAuth2Credentials, axiosConfig: AxiosRequestConfig, cacheDirectory: string): AxiosInstance {
     const client = axios.create(axiosConfig);
     client.interceptors.request.use(async (config) => {
-        const accessToken = await getToken(credentials);
+        const accessToken = await getToken(credentials, cacheDirectory);
         if (accessToken) {
             if (config.headers) {
                 config.headers["Authorization"] = `Bearer ${accessToken}`;

@@ -4,9 +4,9 @@ import path from "path";
 import { OAuth2Credentials } from "..";
 import { AxiosNetworkModule } from "./axios-network-module";
 
-async function getCacheOptions(): Promise<CacheOptions> {
+async function getCacheOptions(cacheDirectory: string): Promise<CacheOptions> {
     // TODO: Set a correct cache path
-    const cachePath = path.join(Environment.getUserRootDirectory(), "./Primno/cache.json");
+    const cachePath = path.join(cacheDirectory, "./cache.json");
 
     const persistenceConfiguration = {
         cachePath,
@@ -21,7 +21,7 @@ async function getCacheOptions(): Promise<CacheOptions> {
     };
 }
 
-export async function getToken(credentials: OAuth2Credentials) {
+export async function getToken(credentials: OAuth2Credentials, cacheDirectory: string) {
     const client = new PublicClientApplication({
         auth: {
             clientId: credentials.client_id,
@@ -39,7 +39,7 @@ export async function getToken(credentials: OAuth2Credentials) {
                 piiLoggingEnabled: false
             }
         },
-        cache: await getCacheOptions()
+        cache: await getCacheOptions(cacheDirectory)
     });
 
     let result: AuthenticationResult | null;
