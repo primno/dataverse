@@ -1,12 +1,8 @@
 import { Environment } from "@azure/msal-node-extensions";
 import { AxiosInstance, Method, AxiosResponse, AxiosError } from "axios";
 import { createAxiosClient } from "./axios-d365";
-import { isNullOrEmpty, isNullOrUndefined } from "./common";
-
-export interface CreateResponse {
-    entityType: string;
-    id: string;
-}
+import { isNullOrUndefined } from "./common";
+import { convertQueryOptionsToString, MultipleQueryOptions, QueryOptions } from "./query-options";
 
 export interface ErrorResponse {
     errorCode: number;
@@ -17,10 +13,30 @@ export interface D365ClientOptions {
     cacheDirectory: string;
 }
 
+interface RequestOptions {
+    method: Method;
+    uri: string;
+    data?: any;
+    headers?: Record<string, string>
+}
+
+export {
+    Condition,
+    Expand,
+    Filter,
+    FilterCondition,
+    FilterType,
+    MultipleQueryOptions,
+    Order,
+    OrderBy,
+    QueryOptions,
+    QueryFunction
+} from "./query-options";
+
 export class D365Client {
     private axiosClient: AxiosInstance | Promise<AxiosInstance>;
-    private apiVersion = "v9.0";
-    private apiBaseUrl = `api/data/${this.apiVersion}/`;
+    private apiVersion = "9.0";
+    private apiBaseUrl = `/api/data/v${this.apiVersion}/`;
     private options: D365ClientOptions;
 
     public constructor(connectionString: string, options?: D365ClientOptions) {
@@ -34,13 +50,27 @@ export class D365Client {
         return await this.axiosClient;
     }
 
-    private async request(method: Method, resource: string, options?: string | null, data?: any): Promise<AxiosResponse> {
+    private readonly defaultHeaders = {
+        "OData-Version": "4.0",
+        "OData-MaxVersion": "4.0",
+        "Accept": "application/json",
+        "Content-Type": "application/json; charset=utf-8"
+    };
+
+    private readonly preferRepresentationHeaders = {
+        "Prefer": "return=representation"
+    }
+
+    private async request(requestOptions: RequestOptions): Promise<AxiosResponse> {
+        const { method, uri, data, headers } = requestOptions;
+
         const client = await this.getAxiosClient();
         try {
             const result = await client.request({
                 method: method,
-                url: `${this.apiBaseUrl}${resource}?${options ?? ""}`,
-                data: data
+                url: `${this.apiBaseUrl}${uri}`,
+                data: data,
+                headers: { ...this.defaultHeaders, ...headers }
             });
             return result;
         }
@@ -61,39 +91,42 @@ export class D365Client {
         }
     }
 
-    public async retrieveRecord<Model extends Record<string, any> = Record<string, any>>(entityLogicalName: string, id: string, options: string): Promise<Model> {
-        return await (await this.request("get", `${entityLogicalName}(${encodeURIComponent(id)})`)).data;
+    public async retrieveRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, id: string, options: QueryOptions): Promise<Model> {
+        const result = await this.request({ method: "get", uri: `${entitySetName}(${id})` });
+        return result.data;
     }
 
-    public async retrieveMultipleRecords<Model extends Record<string, any> = Record<string, any>>(entityLogicalName: string, options?: string): Promise<Model[]> {
-        const result = await this.request("get", entityLogicalName, options);
+    public async retrieveMultipleRecords<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, options: MultipleQueryOptions): Promise<Model[]> {
+        const result = await this.request({ method: "get", uri: `${entitySetName}${convertQueryOptionsToString(options)}` });
         return result.data.value;
     }
 
-    public async createRecord<Model extends Record<string, any> = Record<string, any>>(entityLogicalName: string, data: Model): Promise<CreateResponse> {
-        const result = await this.request("post", entityLogicalName, null, data);
-
-        const regex = new RegExp(`${entityLogicalName}\\(([0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})\\)$`);
-        const regexResult = regex.exec(result.headers["odata-entityid"]);
-        if (isNullOrUndefined(regexResult)) {
-            throw new Error("Unable to extract id");
-        }
-
-        return {
-            entityType: entityLogicalName,
-            id: regexResult[1]
-        };
+    public async createRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, data: Model): Promise<Model> {
+        const result = await this.request({
+            method: "post",
+            uri: entitySetName,
+            data,
+            headers: this.preferRepresentationHeaders
+        });
+        return result.data;
     }
 
-    public async updateRecord<Model extends Record<string, any> = Record<string, any>>(entityLogicalName: string, id: string, data?: Model): Promise<void> {
-        await this.request("patch", `${entityLogicalName}(${encodeURIComponent(id)})`, null, data);
+    public async updateRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, id: string, data?: Model): Promise<Model> {
+        const result = await this.request({
+            method: "patch",
+            uri: `${entitySetName}(${id})`,
+            data,
+            headers: this.preferRepresentationHeaders
+         });
+        return result.data;
     }
 
-    public async deleteRecord(entityLogicalName: string, id: string) {
-        await this.request("delete", `${entityLogicalName}(${encodeURIComponent(id)})`);
+    public async deleteRecord(entitySetName: string, id: string) {
+        await this.request({ method: "delete", uri: `${entitySetName}(${encodeURIComponent(id)})` });
     }
 
     public async executeAction(actionName: string, data: Record<string, any>) {
-        return await (await this.request("post", actionName, null, data)).data;
+        const result = await this.request({ method: "post", uri: actionName, data });
+        return result;
     }
 }
