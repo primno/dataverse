@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "noEmitOnError": true,
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "Node",

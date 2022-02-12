@@ -1,4 +1,4 @@
-import { AuthenticationResult, CacheOptions, ConfidentialClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
+import { AccountInfo, AuthenticationResult, CacheOptions, ConfidentialClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
 import { DataProtectionScope, Environment, PersistenceCachePlugin, PersistenceCreator } from "@azure/msal-node-extensions";
 import path from "path";
 import { OAuth2Credentials } from "..";
@@ -6,7 +6,7 @@ import { AxiosNetworkModule } from "./axios-network-module";
 
 async function getCacheOptions(cacheDirectory: string): Promise<CacheOptions> {
     // TODO: Set a correct cache path
-    const cachePath = path.join(cacheDirectory, "./cache.json");
+    const cachePath = path.join(cacheDirectory, "./msal-cache.json");
 
     const persistenceConfiguration = {
         cachePath,
@@ -53,8 +53,11 @@ export async function getToken(credentials: OAuth2Credentials, cacheDirectory: s
         case "password":
             try {
                 const tokenCache = client.getTokenCache();
-                const account = (await tokenCache.getAllAccounts())[0];
-                result = await client.acquireTokenSilent({ scopes: [credentials.scope as string], account: account });
+                const accounts = await tokenCache.getAllAccounts();
+                
+                const account = accounts.find(a => a.username.toLocaleLowerCase() === credentials.username.toLocaleLowerCase());
+
+                result = await client.acquireTokenSilent({ scopes: [credentials.scope as string], account: account as AccountInfo });
             }
             catch(except) {
                 result = await client.acquireTokenByUsernamePassword({
