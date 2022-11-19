@@ -10,6 +10,8 @@ Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deploy
 
 d365-client works with historical connection strings (see [D365 online doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
 
+Only OAuth and AD (for on-premises) are supported.
+
 ### Examples :
 Dynamics 365 CE (on-premise) : `AuthType=OAuth;RedirectUri=<RedirectUri>;ClientSecret=<ClientSecret>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>`
 
