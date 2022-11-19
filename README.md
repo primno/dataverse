@@ -13,15 +13,18 @@ d365-client works with historical connection strings (see [D365 online doc](http
 Only OAuth and AD (for on-premises) are supported.
 
 ### Examples :
-Dynamics 365 CE (on-premise) : `AuthType=OAuth;RedirectUri=<RedirectUri>;ClientSecret=<ClientSecret>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>`
 
 Dynamics 365 Online : `AuthType=OAuth;Url=https://<Environnement>.crm4.dynamics.com;UserName=<UserName>;Password=<Password>`
 
+Dynamics 365 CE (on-premise) OAuth : `AuthType=OAuth;RedirectUri=<RedirectUri>;ClientSecret=<ClientSecret>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>`
+
+Dynamics 365 CE (on-premise) AD (NTLM authentication): `AuthType=AD;Url=https://<D365Url>;UserName=<AdUserName>;Domain=<Domain>;Password=<Password>`
+
 ## Queries
 
-d365-client support CRUD and execute operations.
+CRUD and execute operations are supported.
 
-### Exemple of usage
+### Exemple
 
 The following code returns the first 10 accounts whose names contain the letter A.
 
