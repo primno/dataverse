@@ -1,6 +1,9 @@
 # Dynamics 365 Client for Node.JS
 
-d365-client is a library written in Typescript that allows you to make requests to the Dynamics 365 / Dataverse APIs in NodeJS.
+[![npm](https://img.shields.io/npm/v/@primno/d365-client.svg)](https://www.npmjs.com/package/@primno/d365-client)
+[![npm](https://img.shields.io/npm/l/@primno/d365-client.svg)](https://github.com/primno/d365-client/blob/main/LICENSE)
+
+d365-client is a library written in Typescript that allows you to make requests to the Dynamics 365 / Dataverse APIs in Node.JS.
 
 Dynamics 365 CE (on-premises) and Dynamics 365 Online are supported.
 
@@ -24,7 +27,7 @@ Dynamics 365 CE (on-premise) AD (NTLM authentication): `AuthType=AD;Url=https://
 
 CRUD and execute operations are supported.
 
-### Exemple
+### Example
 
 The following code returns the first 10 accounts whose names contain the letter A.
 
