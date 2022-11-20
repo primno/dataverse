@@ -1,6 +1,6 @@
 {
   "name": "@primno/d365-client",
-  "version": "0.5.0",
+  "version": "1.0.0-beta.0",
   "description": "Dynamics 365 Client for Node.JS",
   "repository": "github:primno/d365-client",
   "main": "dist/d365-client.cjs.js",
