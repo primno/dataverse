@@ -32,7 +32,7 @@ export class AxiosNetworkModule implements INetworkModule {
 
         const response = await axios(request);
         return {
-            headers: response.headers,
+            headers: response.headers as Record<string, string>,
             body: response.data as T,
             status: response.status,
         };
@@ -57,7 +57,7 @@ export class AxiosNetworkModule implements INetworkModule {
 
         const response = await axios(request);
         return {
-            headers: response.headers,
+            headers: response.headers as Record<string, string>,
             body: response.data as T,
             status: response.status,
         };

@@ -7,9 +7,9 @@ d365-client is a library written in Typescript that allows you to make requests 
 
 Dynamics 365 CE (on-premises) and Dynamics 365 Online are supported.
 
-Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ only).
+Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ only with OAuth enabled).
 
-## Connection string
+## Authentication
 
 d365-client works with historical connection strings (see [D365 online doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
 

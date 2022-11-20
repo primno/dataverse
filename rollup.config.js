@@ -1,7 +1,6 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from "@rollup/plugin-typescript";
 import dts from 'rollup-plugin-dts';
-import { babel } from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import commonJs from '@rollup/plugin-commonjs';
 import pkg from './package.json';
@@ -11,47 +10,45 @@ const external = [
     ...Object.keys(pkg.peerDependencies || {})
 ];
 
-const plugins = [
-    nodeResolve(),
-    commonJs(),
-    typescript({ module: "esnext" }),
-];
+const inputFile = 'src/d365-client.ts';
 
-let pluginsD365 = [...plugins];
+let sourceMap = true;
 
-let sourcemap = "inline";
+const additionnalPlugins = [];
 
 // eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === 'production') {
-    pluginsD365.push(babel({
-        babelHelpers: "bundled",
-        presets: [["env"]]
-    }));
-    pluginsD365.push(terser());
-
-    sourcemap = false;
+    sourceMap = false;
+    additionnalPlugins.push(terser())
 }
 
+const plugins = [
+    nodeResolve(),
+    commonJs(),
+    typescript({ module: "esnext", sourceMap }),
+    ...additionnalPlugins
+];
+
 export default [
-    // Public API (cjs)
+    // CJS
     {
-        input: 'src/d365-client.ts',
+        input: inputFile,
         plugins,
         external,
-        output: { format: 'cjs', file: pkg.main, sourcemap },
+        output: { format: 'cjs', file: pkg.main, sourcemap: sourceMap },
     },
-    // Public API (dts)
+    // DTS
     {
-        input: 'build/d365-client.d.ts',
+        input: inputFile,
         plugins: [dts()],
         external,
         output: { format: 'cjs', file: pkg.types},
     },
-    // Public API (esm)
+    // ESM
     {
-        input: 'src/d365-client.ts',
+        input: inputFile,
         plugins,
         external,
-        output: { format: 'esm', file: pkg.module, sourcemap },
+        output: { format: 'esm', file: pkg.module, sourcemap: sourceMap },
     },
 ];
