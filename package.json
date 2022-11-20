@@ -1,6 +1,6 @@
 {
   "name": "@primno/d365-client",
-  "version": "0.2.0",
+  "version": "0.2.0-beta",
   "description": "Dynamics 365 Client for NodeJS",
   "repository": "github:primno/d365-client",
   "main": "dist/d365-client.cjs.js",
@@ -50,5 +50,9 @@
     "build",
     "dist",
     "node_modules"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }
