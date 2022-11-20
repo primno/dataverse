@@ -17,11 +17,11 @@ export async function discoverAuthority(connectionString: ConnectionStringProces
         maxRedirects: 0
     });
 
-    const authenticateHeader = response.headers[wwwAuthenticate].trim();
+    const authenticateHeader = response.headers[wwwAuthenticate]?.trim();
 
-    if (authenticateHeader.startsWith(bearer)) {
+    if (authenticateHeader?.startsWith(bearer)) {
         const result = authenticateHeader
-            .substr(bearer.length)
+            .substring(bearer.length)
             .split(",")
             .map(kvp => {
                 const keyValues = kvp.trim().split("=");

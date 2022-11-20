@@ -3,8 +3,8 @@ import { ConnectionStringProcessor } from "../../../connnection-string";
 import { HttpsAgentWithRootCA } from "../../https-agent";
 import { discoverAuthority, DiscoveredAuthority } from "./authority";
 import { getToken } from "./msal/token";
+import oauth from "axios-oauth-client";
 
-const oauth = require("axios-oauth-client");
 const tokenProvider = require('axios-token-interceptor');
 
 export interface OAuth2Credentials {
