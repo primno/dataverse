@@ -1,6 +1,6 @@
-# Dynamics 365 Client for NodeJS
+# Dynamics 365 Client for Node.JS
 
-d365-client is a library written in Typescript that allows you to make requests to the Dynamics 365 APIs in NodeJS.
+d365-client is a library written in Typescript that allows you to make requests to the Dynamics 365 / Dataverse APIs in NodeJS.
 
 Dynamics 365 CE (on-premises) and Dynamics 365 Online are supported.
 
