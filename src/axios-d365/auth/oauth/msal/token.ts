@@ -1,5 +1,5 @@
 import { AccountInfo, AuthenticationResult, CacheOptions, ConfidentialClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
-import { DataProtectionScope, Environment, PersistenceCachePlugin, PersistenceCreator } from "@azure/msal-node-extensions";
+import { DataProtectionScope, PersistenceCachePlugin, PersistenceCreator } from "@azure/msal-node-extensions";
 import path from "path";
 import { OAuth2Credentials } from "..";
 import { AxiosNetworkModule } from "./axios-network-module";

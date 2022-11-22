@@ -64,12 +64,15 @@ function createAdfsOAuthClient(credentials: OAuth2Credentials, axiosConfig: Axio
 function convertToOAuth2Credential(connectionString: ConnectionStringProcessor, authority: DiscoveredAuthority, msal: boolean): OAuth2Credentials {
     return {
         client_id: connectionString.clientId as string,
+        // TODO: Support client_credential
         grant_type: "password",
         username: connectionString.userName as string,
         password: connectionString.password as string,
         redirect_uri: connectionString.redirectUri,
         client_secret: connectionString.clientSecret,
         scope: `${authority.resource}${msal ? '/.default' : ''}`,
-        url: msal ? authority.authority.replace("oauth2/authorize", "") : authority.authority.replace("oauth2/authorize", "oauth2/token")
+        url: msal ?
+            authority.authority.replace("oauth2/authorize", "").replace("common", "organizations") :
+            authority.authority.replace("oauth2/authorize", "oauth2/token")
     };
 }

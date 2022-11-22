@@ -12,7 +12,8 @@ export async function discoverAuthority(connectionString: ConnectionStringProces
     const bearer = "Bearer";
 
     const client = axios.create(axiosConfig);
-    const response = await client.get("XRMServices/2011/Organization.svc/web?SDKClientVersion=9.1", {
+    // SDKClientVersion ensures that the WWW-Authenticate header contains authorization_uri
+    const response = await client.get("api/discovery/?SDKClientVersion=9.1", {
         validateStatus: () => true,
         maxRedirects: 0
     });
@@ -42,5 +43,5 @@ export async function discoverAuthority(connectionString: ConnectionStringProces
         }
     }
 
-    throw new Error("Unable to discover authority");
+     throw new Error("Unable to discover authority");
 }
