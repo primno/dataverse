@@ -1,6 +1,6 @@
-import { Environment } from "@azure/msal-node-extensions";
-import { AxiosInstance, Method, AxiosResponse, AxiosError } from "axios";
+import { AxiosInstance, Method, AxiosResponse } from "axios";
 import { createAxiosClient } from "./axios-d365";
+import { Environment } from "./axios-d365/auth/oauth/msal/extensions";
 import { isNullOrUndefined } from "./common";
 import { convertQueryOptionsToString, MultipleQueryOptions, QueryOptions } from "./query-options";
 
@@ -9,8 +9,33 @@ export interface ErrorResponse {
     message: string;
 }
 
+export interface PersistenceOptions {
+    /**
+     * Enable persistence. Default: false.
+     */
+    enabled?: boolean;
+    /**
+     * Cache directory. Default: user root dir.
+     */
+     cacheDirectory?: string;
+     /**
+      * Service name. Default: d365-client
+      */
+     serviceName?: string;
+     /**
+      * Account name. Default: d365-client
+      */
+     accountName?: string;
+}
+
+/**
+ * Configuration of D365-Client.
+ */
 export interface D365ClientOptions {
-    cacheDirectory: string;
+    /**
+     * Configuration of persistence cache.
+     */
+    persistence?: PersistenceOptions;
 }
 
 interface RequestOptions {
@@ -41,7 +66,13 @@ export class D365Client {
 
     public constructor(connectionString: string, options?: D365ClientOptions) {
         this.options = {
-            cacheDirectory: options?.cacheDirectory ?? Environment.getUserRootDirectory()
+            persistence: {
+                enabled: false,
+                accountName: "d365-client",
+                serviceName: "d365-client",
+                cacheDirectory: Environment.getUserRootDirectory(),
+                ...options?.persistence 
+            }
         };
         this.axiosClient = createAxiosClient(connectionString, this.options);
     }

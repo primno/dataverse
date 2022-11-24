@@ -1,27 +1,29 @@
-import { AccountInfo, AuthenticationResult, CacheOptions, ConfidentialClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
-import { DataProtectionScope, PersistenceCachePlugin, PersistenceCreator } from "@azure/msal-node-extensions";
+import { AccountInfo, AuthenticationResult, CacheOptions, LogLevel, PublicClientApplication } from "@azure/msal-node";
 import path from "path";
 import { OAuth2Credentials } from "..";
+import { PersistenceOptions } from "../../../../d365-client";
 import { AxiosNetworkModule } from "./axios-network-module";
+import { DataProtectionScope, IPersistenceConfiguration, PersistenceCachePlugin, PersistenceCreator } from "./extensions";
 
-async function getCacheOptions(cacheDirectory: string): Promise<CacheOptions> {
+async function getCacheOptions(persistenceOptions: PersistenceOptions): Promise<CacheOptions> {
     // TODO: Set a correct cache path
-    const cachePath = path.join(cacheDirectory, "./msal-cache.json");
+    const cachePath = path.join(persistenceOptions.cacheDirectory!, "./msal-cache.json");
 
-    const persistenceConfiguration = {
+    const persistenceConfiguration: IPersistenceConfiguration = {
+        ...persistenceOptions,
         cachePath,
         dataProtectionScope: DataProtectionScope.CurrentUser,
-        usePlaintextFileOnLinux: false,
+        usePlaintextFileOnLinux: false
     };
 
-    const persistence = await PersistenceCreator.createPersistence(persistenceConfiguration);
+    const persistencePlugin = await PersistenceCreator.createPersistence(persistenceConfiguration);
 
     return {
-        cachePlugin: new PersistenceCachePlugin(persistence)
+        cachePlugin: new PersistenceCachePlugin(persistencePlugin)
     };
 }
 
-export async function getToken(credentials: OAuth2Credentials, cacheDirectory: string) {
+export async function getToken(credentials: OAuth2Credentials, persistence: PersistenceOptions) {
     const client = new PublicClientApplication({
         auth: {
             clientId: credentials.client_id,
@@ -39,7 +41,7 @@ export async function getToken(credentials: OAuth2Credentials, cacheDirectory: s
                 piiLoggingEnabled: false
             }
         },
-        cache: await getCacheOptions(cacheDirectory)
+        cache: persistence.enabled ? await getCacheOptions(persistence) : undefined
     });
 
     let result: AuthenticationResult | null;
