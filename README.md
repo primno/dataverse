@@ -7,7 +7,10 @@ d365-client is a library written in Typescript that allows you to make requests 
 
 Dynamics 365 CE (on-premises) and Dynamics 365 Online are supported.
 
-Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA deployment (ADFS 2019+ only with OAuth enabled).
+Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ only with OAuth enabled).
+
+> **Important**
+> d365-client is in beta stage and subject to change.
 
 ## Installation
 ```powershell
@@ -28,7 +31,7 @@ d365-client works with historical connection strings (see [D365 online doc](http
 
 ### Examples :
 
-Dynamics 365 Online : `AuthType=OAuth;Url=https://<Environnement>.crm4.dynamics.com;UserName=<UserName>;Password=<Password>`
+Dynamics 365 Online : `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;Password=<Password>`
 
 Dynamics 365 CE (on-premise) OAuth : `AuthType=OAuth;RedirectUri=<RedirectUri>;ClientSecret=<ClientSecret>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>`
 
@@ -40,7 +43,7 @@ CRUD and execute operations are supported.
 
 ### Example
 
-The following code returns the first 10 accounts whose names contain the letter A.
+The following code returns the first 10 accounts.
 
 ```ts
 import { D365Client } from '@primno/d365-client';
@@ -54,11 +57,11 @@ const connectionString = '...';
 const d365Client = new D365Client(connectionString);
 
 const accounts = await d365Client.retrieveMultipleRecords<Account>(
-    "account",
+    "accounts",
     {
         top: 10,
-        filters: [{ conditions: [{ attribute: "name", operator: "Contains", value: "A" }] }],
         select: ["name", "emailaddress1"],
+        orders: [{ attribute: "name", order: "asc" }]
     }
 );
 ```
