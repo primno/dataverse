@@ -6,11 +6,11 @@
 import { IPersistence } from "./IPersistence";
 import { FilePersistence } from "./FilePersistence";
 import { PersistenceError } from "../error/PersistenceError";
-import { Dpapi } from "../Dpapi";
 import { DataProtectionScope } from "./DataProtectionScope";
 import { Logger, LoggerOptions } from "@azure/msal-common";
 import { dirname } from "path";
 import { BasePersistence } from "./BasePersistence";
+import { Dpapi } from "@primno/dpapi";
 
 /**
  * Uses CryptProtectData and CryptUnprotectData on Windows to encrypt and decrypt file contents.
