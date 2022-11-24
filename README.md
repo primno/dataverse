@@ -69,3 +69,4 @@ const accounts = await d365Client.retrieveMultipleRecords<Account>(
 ## Credits
 
 Thanks to [HSO](https://github.com/hso-nn/d365-cli) for query options.
+Thanks to Microsoft for persistence cache.

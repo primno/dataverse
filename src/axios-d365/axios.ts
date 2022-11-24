@@ -17,7 +17,7 @@ export async function createAxiosClient(connectionString: string, options: D365C
 
     switch (connectionStringProcessor.authType) {
         case AuthenticationType.AD:     return createNtlmClient(connectionStringProcessor, axiosConfig);
-        case AuthenticationType.OAuth:  return await createOAuthClient(connectionStringProcessor, axiosConfig, options.cacheDirectory);
+        case AuthenticationType.OAuth:  return await createOAuthClient(connectionStringProcessor, axiosConfig, options.persistence!);
 
         default: return axios.create(axiosConfig);
     }

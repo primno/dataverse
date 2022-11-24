@@ -4,6 +4,7 @@ import { HttpsAgentWithRootCA } from "../../https-agent";
 import { discoverAuthority, DiscoveredAuthority } from "./authority";
 import { getToken } from "./msal/token";
 import oauth from "axios-oauth-client";
+import { PersistenceOptions } from "../../../d365-client";
 
 const tokenProvider = require('axios-token-interceptor');
 
@@ -18,22 +19,22 @@ export interface OAuth2Credentials {
     scope?: string;
 }
 
-export async function createOAuthClient(connectionStringProcessor: ConnectionStringProcessor, axiosConfig: AxiosRequestConfig, cacheDirectory: string) {
+export async function createOAuthClient(connectionStringProcessor: ConnectionStringProcessor, axiosConfig: AxiosRequestConfig, persistence: PersistenceOptions) {
     let authority = await discoverAuthority(connectionStringProcessor, axiosConfig);
     const credentials = convertToOAuth2Credential(connectionStringProcessor, authority, connectionStringProcessor.isOnline == true);
 
     if (connectionStringProcessor.isOnline) {
-        return createMsalClient(credentials, axiosConfig, cacheDirectory);
+        return createMsalClient(credentials, axiosConfig, persistence);
     }
     else {
         return createAdfsOAuthClient(credentials, axiosConfig);
     }
 }
 
-function createMsalClient(credentials: OAuth2Credentials, axiosConfig: AxiosRequestConfig, cacheDirectory: string): AxiosInstance {
+function createMsalClient(credentials: OAuth2Credentials, axiosConfig: AxiosRequestConfig, persistence: PersistenceOptions): AxiosInstance {
     const client = axios.create(axiosConfig);
     client.interceptors.request.use(async (config) => {
-        const accessToken = await getToken(credentials, cacheDirectory);
+        const accessToken = await getToken(credentials, persistence);
         if (accessToken) {
             if (config.headers) {
                 config.headers["Authorization"] = `Bearer ${accessToken}`;
