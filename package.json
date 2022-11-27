@@ -3,9 +3,9 @@
   "version": "0.6.1-beta.0",
   "description": "Dynamics 365 Client for Node.JS",
   "repository": "github:primno/d365-client",
-  "main": "dist/d365-client.cjs.js",
-  "module": "dist/d365-client.esm.js",
-  "types": "dist/d365-client.d.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],

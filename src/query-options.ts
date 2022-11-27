@@ -1,6 +1,6 @@
 // Thanks to https://github.com/hso-nn/d365-cli/blob/1fab244929112ebb685953ce5f266f4e1a8d992d/bin/root/src/WebApi/SystemQueryOptions.ts
 
-import { EmptyString } from "./common";
+import { EmptyString } from "./utils/common";
 
 export type RetrieveMultipleOptions = MultipleQueryOptions | string;
 

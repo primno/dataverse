@@ -4,7 +4,7 @@ import { HttpsAgentWithRootCA } from "../../https-agent";
 import { discoverAuthority, DiscoveredAuthority } from "./authority";
 import { getToken } from "./msal/token";
 import oauth from "axios-oauth-client";
-import { PersistenceOptions } from "../../../d365-client";
+import { PersistenceOptions } from "../../../d365-client-options";
 
 const tokenProvider = require('axios-token-interceptor');
 

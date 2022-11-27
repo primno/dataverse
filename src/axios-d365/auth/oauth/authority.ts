@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { isNullOrEmpty } from "../../../common";
+import { isNullOrEmpty } from "../../../utils/common";
 import { ConnectionStringProcessor } from "../../../connnection-string";
 
 export interface DiscoveredAuthority {

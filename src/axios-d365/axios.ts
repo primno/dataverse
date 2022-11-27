@@ -4,7 +4,7 @@ import { HttpsAgentWithRootCA } from "./https-agent";
 import { createNtlmClient } from "./auth/ntlm";
 import { createOAuthClient } from "./auth/oauth";
 import axios, { AxiosRequestConfig } from "axios";
-import { D365ClientOptions } from "../d365-client";
+import { D365ClientOptions } from "../d365-client-options";
 
 export async function createAxiosClient(connectionString: string, options: D365ClientOptions) {
     const connectionStringProcessor = new ConnectionStringProcessor(connectionString);

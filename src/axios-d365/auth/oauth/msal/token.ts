@@ -1,7 +1,7 @@
 import { AccountInfo, AuthenticationResult, CacheOptions, LogLevel, PublicClientApplication } from "@azure/msal-node";
 import path from "path";
 import { OAuth2Credentials } from "..";
-import { PersistenceOptions, PersistenceOptionsEnabled } from "../../../../d365-client";
+import { PersistenceOptions, PersistenceOptionsEnabled } from "../../../../d365-client-options";
 import { AxiosNetworkModule } from "./axios-network-module";
 import { DataProtectionScope, IPersistenceConfiguration, PersistenceCachePlugin, PersistenceCreator } from "./extensions";
 
