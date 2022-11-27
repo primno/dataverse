@@ -51,7 +51,9 @@ export type QueryFunction = "Above" | "AboveOrEqual" | "Between" | "Contains" | 
     "OlderThanXHours" | "OlderThanXMinutes" | "OlderThanXMonths" | "OlderThanXWeeks" | "OlderThanXYears" | "On" | "OnOrAfter" | "OnOrBefore" | "ThisFiscalPerios" |
     "ThisFiscalYear" | "ThisMonth" | "ThisWeek" | "ThisYear" | "Today" | "Tomorrow" | "Under" | "UnderOrEqual" | "Yesterday";
 
-export type FilterCondition = "eq" | "ne" | "gt" | "ge" | "lt"| "le";
+    
+const filterCondition = ["eq", "ne", "gt", "ge", "lt", "le"] as const;
+export type FilterCondition = typeof filterCondition[number];
 
 export interface Condition {
     attribute: string;
@@ -93,36 +95,59 @@ export function convertQueryOptionsToString(options: MultipleQueryOptions): stri
     if ($expand) {
         optionParts.push($expand)
     }
-    return optionParts.length > 0 ? `?${optionParts.join("&")}` : "";
+    return optionParts.length > 0 ? `?${optionParts.join("&")}` : EmptyString;
 }
 
 function generateExpand(expands: Expand[]= []): string {
     const expandsText = expands.map(e => `${e.attribute}(${generateSelect(e.select)})`);
-    return expandsText.length > 0 ? `$expand=${expandsText.join(",")}` : "";
+    return expandsText.length > 0 ? `$expand=${expandsText.join(",")}` : EmptyString;
 }
 
 function generateSelect(attributes: string[] = []): string {
-    return attributes.length > 0 ? `$select=${attributes.join(",")}` : "";
+    return attributes.length > 0 ? `$select=${attributes.join(",")}` : EmptyString;
 }
 
 function generateFilter(filters: Filter[] = []): string {
-    const filterAttributes: string[] = [];
-    if (filters.length > 0) {
-        for (const filter of filters) {
-            filterAttributes.push(parseFilter(filter));
+    const filterAttributes = filters.map(f => parseFilter(f));
+    return filterAttributes.length > 0 ? `$filter=${filterAttributes.join(" and ")}` : EmptyString;
+}
+
+function parseQueryFunction(condition: Condition): string {
+    const { attribute, operator = 'eq', value } = condition;
+
+    let propertyValueStr = EmptyString;
+
+    if (value !== undefined) {
+        if (Array.isArray(value)) {
+            const values = value.map(val => `'${val}'`);
+            propertyValueStr = `,PropertyValues=[${values.join(',')}]`;
+        } else {
+            propertyValueStr = `,PropertyValue='${value}'`;
         }
     }
-    return filterAttributes.length > 0 ? `$filter=${filterAttributes.join(" and ")}` : "";
+    
+    return `Microsoft.Dynamics.CRM.${operator}(PropertyName='${attribute}'${propertyValueStr})`;
+}
+
+function parseFilterCondition(condition: Condition) {
+    const { attribute, operator, value } = condition;
+    const valueStr = typeof(value) === "string" ? `'${value}'` : `${value}`;
+    return `${attribute} ${operator} ${valueStr}`;
 }
 
 function parseFilter(filter: Filter): string {
-    const { type = "and", conditions } = filter,
-        filterParts: string[] = [];
+    const { type = "and", conditions } = filter;
+    const filterParts: string[] = [];
+
     for (const condition of conditions) {
-        const { attribute, operator = "eq", value } = condition;
-        let filterStr = `${attribute} ${operator}`;
-        filterStr += typeof(value) === "string" ? ` '${value}'` : ` ${value}`;
-        filterParts.push(filterStr);
+        const { operator = "eq" } = condition;
+        if (filterCondition.includes(operator as FilterCondition)) {
+            filterParts.push(parseFilterCondition(condition));
+        }
+        else {
+            filterParts.push(parseQueryFunction(condition));
+        }
     }
+
     return `(${filterParts.join(` ${type} `)})`;
 }

@@ -45,54 +45,82 @@ CRUD and execute operations are supported.
 
 ### Examples
 
-The following code returns the first 10 accounts.
+1. Retrieves first 10 accounts.
 
-```ts
-import { D365Client } from '@primno/d365-client';
+    ```ts
+    import { D365Client } from '@primno/d365-client';
 
-interface Account {
-    name: string;
-    emailaddress1: string;
-}
-
-const connectionString = '...';
-const d365Client = new D365Client(connectionString);
-
-const accounts = await d365Client.retrieveMultipleRecords<Account>(
-    "accounts",
-    {
-        top: 10,
-        select: ["name", "emailaddress1"],
-        orders: [{ attribute: "name", order: "asc" }]
+    interface Account {
+        name: string;
+        emailaddress1: string;
     }
-);
-```
 
-The following code returns actives opportunies using a custom query option string.
+    const connectionString = '...';
+    const d365Client = new D365Client(connectionString);
 
-```ts
-const opportunities = await d365Client.retrieveMultipleRecords("opportunities", "?$select=name,$filter=state eq 0");
-```
+    const accounts = await d365Client.retrieveMultipleRecords<Account>(
+        "accounts",
+        {
+            top: 10,
+            select: ["name", "emailaddress1"],
+            orders: [{ attribute: "name", order: "asc" }]
+        }
+    );
+    ```
 
-The following code returns all contacts using OData pagination. The page size is set to 50. The nextLink attribute is used to get the next page.
+1. Create a contact.
 
-```ts
-const contacts = []; // Will contain all contacts.
+    ```ts
+    const contact = await client.createRecord("contacts", {
+        firstname: "Sophie", lastname: "Germain"
+    });
+    ```
+1. Delete a account.
 
-let options: RetrieveMultipleOptions | undefined = {
-    select: ["firstname", "lastname"]
-};
+    ```ts
+    await client.deleteRecord("accounts", "00000000-0000-0000-0000-000000000000");
+    ```
 
-let result: EntityCollection;
+1. Retrieves a contact by its id.
+    ```ts
+    const contact = await client.retrieveRecord("contacts", "00000000-0000-0000-0000-000000000000", { select: ["firstname"] });
+    ```
 
-do {
-    result = await client.retrieveMultipleRecords("contacts", options, 50 /* Page Size = 50 */);
-    contacts.push(...result.entities);
-    options = result.nextLink;
-} while(result.nextLink);
+1. Retrieves actives opportunies using a custom query option string.
 
-console.log(contacts);
-```
+    ```ts
+    const opportunities = await d365Client.retrieveMultipleRecords("opportunities", "?$select=name,$filter=state eq 0");
+    ```
+
+1. Retrieves all contacts using OData pagination.
+    The page size is set to 50. The nextLink attribute is used to get the next page.
+
+    ```ts
+    const contacts = []; // Will contain all contacts.
+
+    let options: RetrieveMultipleOptions | undefined = {
+        select: ["firstname", "lastname"]
+    };
+
+    let result: EntityCollection;
+
+    do {
+        result = await client.retrieveMultipleRecords("contacts", options, 50 /* Page Size = 50 */);
+        contacts.push(...result.entities);
+        options = result.nextLink;
+    } while(result.nextLink);
+
+    console.log(contacts);
+    ```
+
+1. Retrieves contacts created this month.
+
+    ```ts
+    const contacts = await client.retrieveMultipleRecords("accounts", {
+        select: ["name"],
+        filters: [{ conditions: [{ attribute: "createdon", operator: "ThisMonth" }] }]
+    });
+    ```
 
 ## Credits
 

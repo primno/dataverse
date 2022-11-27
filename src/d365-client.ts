@@ -85,7 +85,9 @@ export {
     Order,
     OrderBy,
     QueryOptions,
-    QueryFunction
+    QueryFunction,
+    RetrieveMultipleOptions,
+    RetrieveOptions
 } from "./query-options";
 
 export class D365Client {
