@@ -66,7 +66,28 @@ const accounts = await d365Client.retrieveMultipleRecords<Account>(
 );
 ```
 
+The following code returns all contacts using OData pagination. The page size is set to 50. The nextLink attribute is used to get the next page.
+
+```ts
+const contacts = []; // Will contain all contacts.
+
+let options: RetrieveMultipleOptions | undefined = {
+    select: ["firstname", "lastname"]
+};
+
+let result: EntityCollection;
+
+do {
+    result = await client.retrieveMultipleRecords("contacts", options, 50 /* Page Size = 50 */);
+    contacts.push(...result.entities);
+    options = result.nextLink;
+} while(result.nextLink);
+
+console.log(contacts);
+```
+
 ## Credits
 
 Thanks to [HSO](https://github.com/hso-nn/d365-cli) for query options.
+
 Thanks to Microsoft for persistence cache.

@@ -1,5 +1,31 @@
 // Thanks to https://github.com/hso-nn/d365-cli/blob/1fab244929112ebb685953ce5f266f4e1a8d992d/bin/root/src/WebApi/SystemQueryOptions.ts
 
+import { EmptyString } from "./common";
+
+export type RetrieveMultipleOptions = MultipleQueryOptions | string;
+
+export function convertRetrieveMultipleOptionsToString(options: RetrieveMultipleOptions | undefined) {
+    switch (typeof options) {
+        case "string": 
+            if (!options.startsWith("?")) {
+                throw new Error("Query option must start with ?");
+            }
+            return options;
+        case "object": return convertQueryOptionsToString(options);
+        case "undefined": return EmptyString;
+        default:
+            throw new Error("Invalid retrieve multiple options");
+    }
+}
+
+export type RetrieveOptions = QueryOptions | string;
+
+export function convertRetrieveOptionsToString(options: RetrieveOptions | undefined) {
+    return convertRetrieveMultipleOptionsToString(options);
+}
+
+// ---
+
 export interface Expand {
     attribute: string;
     select: string[];

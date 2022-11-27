@@ -1,7 +1,6 @@
 import { AxiosInstance, Method, AxiosResponse } from "axios";
 import { createAxiosClient } from "./axios-d365";
-import { isNullOrUndefined } from "./common";
-import { convertQueryOptionsToString, MultipleQueryOptions, QueryOptions } from "./query-options";
+import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
 
 export interface ErrorResponse {
     errorCode: number;
@@ -12,19 +11,19 @@ export interface PersistenceOptionsEnabled {
     /**
      * Enable persistence. Default: false.
      */
-     enabled: true;
-     /**
-      * Cache directory.
-      */
-      cacheDirectory: string;
-      /**
-       * Service name.
-       */
-      serviceName: string;
-      /**
-       * Account name.
-       */
-      accountName: string;
+    enabled: true;
+    /**
+     * Cache directory.
+     */
+    cacheDirectory: string;
+    /**
+     * Service name.
+     */
+    serviceName: string;
+    /**
+     * Account name.
+     */
+    accountName: string;
 }
 
 interface PersistenceOptionsDisabled {
@@ -60,6 +59,22 @@ interface RequestOptions {
     headers?: Record<string, string>
 }
 
+/**
+ * Collection of entities.
+ */
+export interface EntityCollection<TModele extends Modele = Modele> {
+    /**
+     * Entities.
+     */
+    entities: TModele[];
+    /**
+     * Nextlink to retrieve next page. To retrieve the next page, nextLink must be passed to the options parameter of retrieveMultipleRecords().
+     */
+    nextLink?: string;
+}
+
+type Modele = Record<string, any>;
+
 export {
     Condition,
     Expand,
@@ -85,7 +100,7 @@ export class D365Client {
 
             persistence: {
                 enabled: false,
-                ...options?.persistence 
+                ...options?.persistence
             }
         };
 
@@ -108,6 +123,10 @@ export class D365Client {
         "Prefer": "return=representation"
     }
 
+    private getMaxPageSizeHeader(maxPageSize: number) {
+        return {"Prefer": `odata.maxpagesize=${maxPageSize}`};
+    }
+
     private async request(requestOptions: RequestOptions): Promise<AxiosResponse> {
         const { method, uri, data, headers } = requestOptions;
 
@@ -121,10 +140,10 @@ export class D365Client {
             });
             return result;
         }
-        catch(except: any) {
+        catch (except: any) {
             if (except.isAxiosError) {
                 const data = except.response.data;
-                if (!isNullOrUndefined(data.error)) {
+                if (data.error != null) {
                     const errorResponse = data.error as ErrorResponse
                     throw new Error(errorResponse.message);
                 }
@@ -145,20 +164,37 @@ export class D365Client {
      * @param options Selected fields.
      * @returns The record
      */
-    public async retrieveRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, id: string, options: QueryOptions): Promise<Model> {
-        const result = await this.request({ method: "get", uri: `${entitySetName}(${id})${convertQueryOptionsToString(options)}` });
+    public async retrieveRecord<TModele extends Modele = Modele>(entitySetName: string, id: string, options?: RetrieveOptions): Promise<TModele> {
+        const result = await this.request({ method: "get", uri: `${entitySetName}(${id})${convertRetrieveOptionsToString(options)}` });
         return result.data;
     }
 
     /**
      * Retrieves a collection of records.
      * @param entitySetName Entity set name. Eg: accounts, contacts.
-     * @param options OData query options.
+     * @param options OData query options. Can be a a custom string, a query options object or the nextLink of a previous result of retrieveMultipleRecords().
+     * @param maxPageSize Max page size to retrieve. Default value is 5000.
+     * @example
+     * // Retrieve 2 accounts. Select only the name.
+     * retrieveMultipleRecords("accounts", "?$select=name&$top=2");
+     * // Retrieve all contacts with the last name Smith. Select only the first name and the last name.
+     * retrieveMultipleRecords("contacts", {
+     *      select: ["firstname", "lastname"],
+     *      filter: [{ conditions: [{ attribute: "lastname", operator: "eq", value: "Smith"}] }]
+     * });
      * @returns Collection of records.
      */
-    public async retrieveMultipleRecords<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, options: MultipleQueryOptions): Promise<Model[]> {
-        const result = await this.request({ method: "get", uri: `${entitySetName}${convertQueryOptionsToString(options)}` });
-        return result.data.value;
+    public async retrieveMultipleRecords<TModele extends Modele = Modele>(
+        entitySetName: string,
+        options?: RetrieveMultipleOptions,
+        maxPageSize?: number
+    ): Promise<EntityCollection<TModele>> {
+        const result = await this.request({
+            method: "get",
+            uri: `${entitySetName}${convertRetrieveMultipleOptionsToString(options)}`,
+            headers: maxPageSize == null ? undefined : this.getMaxPageSizeHeader(maxPageSize)
+        });
+        return { entities: result.data.value, nextLink: result.data["@odata.nextLink"]?.replace(/.+\?/, "?") };
     }
 
     /**
@@ -167,7 +203,7 @@ export class D365Client {
      * @param data Record to create.
      * @returns Created record.
      */
-    public async createRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, data: Model): Promise<Model> {
+    public async createRecord<TModele extends Modele = Modele>(entitySetName: string, data: TModele): Promise<TModele> {
         const result = await this.request({
             method: "post",
             uri: entitySetName,
@@ -184,13 +220,13 @@ export class D365Client {
      * @param data Record with updated data.
      * @returns Updated record.
      */
-    public async updateRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, id: string, data?: Model): Promise<Model> {
+    public async updateRecord<TModele extends Modele = Modele>(entitySetName: string, id: string, data?: TModele): Promise<TModele> {
         const result = await this.request({
             method: "patch",
             uri: `${entitySetName}(${id})`,
             data,
             headers: this.preferRepresentationHeaders
-         });
+        });
         return result.data;
     }
 
