@@ -1,6 +1,5 @@
 import { AxiosInstance, Method, AxiosResponse } from "axios";
 import { createAxiosClient } from "./axios-d365";
-import { Environment } from "./axios-d365/auth/oauth/msal/extensions";
 import { isNullOrUndefined } from "./common";
 import { convertQueryOptionsToString, MultipleQueryOptions, QueryOptions } from "./query-options";
 
@@ -9,24 +8,33 @@ export interface ErrorResponse {
     message: string;
 }
 
-export interface PersistenceOptions {
+export interface PersistenceOptionsEnabled {
     /**
      * Enable persistence. Default: false.
      */
-    enabled?: boolean;
-    /**
-     * Cache directory. Default: user root dir.
-     */
-     cacheDirectory?: string;
+     enabled: true;
      /**
-      * Service name. Default: d365-client
+      * Cache directory.
       */
-     serviceName?: string;
-     /**
-      * Account name. Default: d365-client
-      */
-     accountName?: string;
+      cacheDirectory: string;
+      /**
+       * Service name.
+       */
+      serviceName: string;
+      /**
+       * Account name.
+       */
+      accountName: string;
 }
+
+interface PersistenceOptionsDisabled {
+    /**
+     * Enable persistence. Default: false.
+     */
+    enabled?: false;
+}
+
+export type PersistenceOptions = PersistenceOptionsEnabled | PersistenceOptionsDisabled;
 
 /**
  * Configuration of D365-Client.
@@ -68,12 +76,10 @@ export class D365Client {
         this.options = {
             persistence: {
                 enabled: false,
-                accountName: "d365-client",
-                serviceName: "d365-client",
-                cacheDirectory: Environment.getUserRootDirectory(),
                 ...options?.persistence 
             }
         };
+
         this.axiosClient = createAxiosClient(connectionString, this.options);
     }
 

@@ -1,11 +1,11 @@
 import { AccountInfo, AuthenticationResult, CacheOptions, LogLevel, PublicClientApplication } from "@azure/msal-node";
 import path from "path";
 import { OAuth2Credentials } from "..";
-import { PersistenceOptions } from "../../../../d365-client";
+import { PersistenceOptions, PersistenceOptionsEnabled } from "../../../../d365-client";
 import { AxiosNetworkModule } from "./axios-network-module";
 import { DataProtectionScope, IPersistenceConfiguration, PersistenceCachePlugin, PersistenceCreator } from "./extensions";
 
-async function getCacheOptions(persistenceOptions: PersistenceOptions): Promise<CacheOptions> {
+async function getCacheOptions(persistenceOptions: PersistenceOptionsEnabled): Promise<CacheOptions> {
     // TODO: Set a correct cache path
     const cachePath = path.join(persistenceOptions.cacheDirectory!, "./msal-cache.json");
 
