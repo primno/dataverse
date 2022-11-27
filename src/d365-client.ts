@@ -128,16 +128,35 @@ export class D365Client {
         }
     }
 
+    /**
+     * Gets a record from its id.
+     * @param entitySetName Entity set name. Eg: accounts, contacts.
+     * @param id Guid of the record you want to retrieve.
+     * @param options Selected fields.
+     * @returns The record
+     */
     public async retrieveRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, id: string, options: QueryOptions): Promise<Model> {
-        const result = await this.request({ method: "get", uri: `${entitySetName}(${id})` });
+        const result = await this.request({ method: "get", uri: `${entitySetName}(${id})${convertQueryOptionsToString(options)}` });
         return result.data;
     }
 
+    /**
+     * Retrieves a collection of records.
+     * @param entitySetName Entity set name. Eg: accounts, contacts.
+     * @param options OData query options.
+     * @returns Collection of records.
+     */
     public async retrieveMultipleRecords<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, options: MultipleQueryOptions): Promise<Model[]> {
         const result = await this.request({ method: "get", uri: `${entitySetName}${convertQueryOptionsToString(options)}` });
         return result.data.value;
     }
 
+    /**
+     * Create a record.
+     * @param entitySetName Entity set name. Eg: accounts, contacts.
+     * @param data Record to create.
+     * @returns Created record.
+     */
     public async createRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, data: Model): Promise<Model> {
         const result = await this.request({
             method: "post",
@@ -148,6 +167,13 @@ export class D365Client {
         return result.data;
     }
 
+    /**
+     * Update a record.
+     * @param entitySetName  Entity set name. Eg: accounts, contacts.
+     * @param id Guid of the record you want to update.
+     * @param data Record with updated data.
+     * @returns Updated record.
+     */
     public async updateRecord<Model extends Record<string, any> = Record<string, any>>(entitySetName: string, id: string, data?: Model): Promise<Model> {
         const result = await this.request({
             method: "patch",
@@ -158,6 +184,11 @@ export class D365Client {
         return result.data;
     }
 
+    /**
+     * Delete a record.
+     * @param entitySetName Entity set name. Eg: accounts, contacts.
+     * @param id Guid of the record you want to delete.
+     */
     public async deleteRecord(entitySetName: string, id: string) {
         await this.request({ method: "delete", uri: `${entitySetName}(${encodeURIComponent(id)})` });
     }
