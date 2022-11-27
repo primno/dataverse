@@ -36,6 +36,8 @@ interface PersistenceOptionsDisabled {
 
 export type PersistenceOptions = PersistenceOptionsEnabled | PersistenceOptionsDisabled;
 
+export type ApiVersion = "9.0" | "9.1" | "9.2";
+
 /**
  * Configuration of D365-Client.
  */
@@ -44,6 +46,11 @@ export interface D365ClientOptions {
      * Configuration of persistence cache.
      */
     persistence?: PersistenceOptions;
+
+    /**
+     * WebAPI version. Default: 9.0.
+     */
+    apiVersion?: ApiVersion;
 }
 
 interface RequestOptions {
@@ -68,18 +75,21 @@ export {
 
 export class D365Client {
     private axiosClient: AxiosInstance | Promise<AxiosInstance>;
-    private apiVersion = "9.0";
-    private apiBaseUrl = `/api/data/v${this.apiVersion}/`;
+    private apiBaseUrl: string;
     private options: D365ClientOptions;
 
     public constructor(connectionString: string, options?: D365ClientOptions) {
         this.options = {
+            apiVersion: "9.0",
+            ...options,
+
             persistence: {
                 enabled: false,
                 ...options?.persistence 
             }
         };
 
+        this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`
         this.axiosClient = createAxiosClient(connectionString, this.options);
     }
 
