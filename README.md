@@ -21,6 +21,8 @@ Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deploy
 
 d365-client works with historical connection strings (see [D365 online doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
 
+Persistence token cache is supported for Dynamics 365 Online.
+
 ### Supported authentication type
 
 | Auth type                          | Online             | On-premises        |
@@ -41,7 +43,7 @@ Dynamics 365 CE (on-premise) AD (NTLM authentication): `AuthType=AD;Url=https://
 
 CRUD and execute operations are supported.
 
-### Example
+### Examples
 
 The following code returns the first 10 accounts.
 
@@ -64,6 +66,12 @@ const accounts = await d365Client.retrieveMultipleRecords<Account>(
         orders: [{ attribute: "name", order: "asc" }]
     }
 );
+```
+
+The following code returns actives opportunies using a custom query option string.
+
+```ts
+const opportunities = await d365Client.retrieveMultipleRecords("opportunities", "?$select=name,$filter=state eq 0");
 ```
 
 The following code returns all contacts using OData pagination. The page size is set to 50. The nextLink attribute is used to get the next page.
