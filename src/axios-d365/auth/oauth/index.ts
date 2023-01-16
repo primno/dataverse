@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosHeaders, AxiosInstance, AxiosRequestConfig } from "axios";
 import { ConnectionStringProcessor } from "../../../connnection-string";
 import { HttpsAgentWithRootCA } from "../../https-agent";
 import { discoverAuthority, DiscoveredAuthority } from "./authority";
@@ -36,8 +36,10 @@ function createMsalClient(credentials: OAuth2Credentials, axiosConfig: AxiosRequ
     client.interceptors.request.use(async (config) => {
         const accessToken = await getToken(credentials, persistence);
         if (accessToken) {
-            if (config.headers) {
-                config.headers["Authorization"] = `Bearer ${accessToken}`;
+            if (config.headers != null) {
+                // HACK: Fix axios header problem. See #5416 in axios repo
+                config.headers = { ...config.headers } as AxiosHeaders;
+                config.headers.set("Authorization", `Bearer ${accessToken}`);
             }
         }
 
