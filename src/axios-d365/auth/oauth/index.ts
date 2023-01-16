@@ -38,8 +38,7 @@ function createMsalClient(credentials: OAuth2Credentials, axiosConfig: AxiosRequ
         if (accessToken) {
             if (config.headers != null) {
                 // HACK: Fix axios header problem. See #5416 in axios repo
-                config.headers = { ...config.headers } as AxiosHeaders;
-                config.headers.set("Authorization", `Bearer ${accessToken}`);
+                (config.headers as any).Authorization = `Bearer ${accessToken}`;
             }
         }
 
