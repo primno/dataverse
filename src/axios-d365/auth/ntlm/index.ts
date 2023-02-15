@@ -1,6 +1,6 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 import { NtlmCredentials, NtlmClient } from "axios-ntlm";
-import { ConnectionStringProcessor } from "../../../connnection-string";
+import { ConnectionStringProcessor } from "../../../connection-string";
 
 function convertToNetworkCredential(connectionString: ConnectionStringProcessor) {
     return { 

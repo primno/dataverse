@@ -1,13 +1,12 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { isNullOrEmpty } from "../../../utils/common";
-import { ConnectionStringProcessor } from "../../../connnection-string";
 
 export interface DiscoveredAuthority {
     authority: string; 
     resource?: string;
 }
 
-export async function discoverAuthority(connectionString: ConnectionStringProcessor, axiosConfig: AxiosRequestConfig): Promise<DiscoveredAuthority> {
+export async function discoverAuthority(axiosConfig: AxiosRequestConfig): Promise<DiscoveredAuthority> {
     const wwwAuthenticate = "www-authenticate";
     const bearer = "Bearer";
 

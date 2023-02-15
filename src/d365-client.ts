@@ -1,6 +1,6 @@
 import { AxiosInstance, Method, AxiosResponse } from "axios";
 import { createAxiosClient } from "./axios-d365";
-import { D365ClientOptions } from "./d365-client-options";
+import { D365ClientOptions, OAuthOptions } from "./d365-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
 
 interface ErrorResponse {
@@ -41,14 +41,17 @@ export class D365Client {
             apiVersion: "9.0",
             ...options,
 
-            persistence: {
-                enabled: false,
-                ...options?.persistence
+            oAuth: {
+                persistence: {
+                    enabled: false,
+                    ...options?.oAuth?.persistence
+                },
+                ...options?.oAuth,
             }
         };
 
         this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`
-        this.axiosClient = createAxiosClient(connectionString, this.options);
+        this.axiosClient = createAxiosClient(connectionString, this.options.oAuth!);
     }
 
     private async getAxiosClient() {
