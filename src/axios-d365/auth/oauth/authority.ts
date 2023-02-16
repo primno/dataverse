@@ -17,7 +17,7 @@ export async function discoverAuthority(axiosConfig: AxiosRequestConfig): Promis
         maxRedirects: 0
     });
 
-    const authenticateHeader = response.headers[wwwAuthenticate]?.trim();
+    const authenticateHeader = response.headers[wwwAuthenticate]?.trim() as string | undefined;
 
     if (authenticateHeader?.startsWith(bearer)) {
         const result = authenticateHeader

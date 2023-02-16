@@ -1,6 +1,6 @@
 {
   "name": "@primno/d365-client",
-  "version": "0.6.1-beta.3",
+  "version": "0.6.1-beta.4",
   "description": "Dynamics 365 Client for Node.JS",
   "repository": "github:primno/d365-client",
   "main": "dist/index.cjs.js",
@@ -22,9 +22,9 @@
   "dependencies": {
     "@azure/msal-node": "^1.14.3",
     "@primno/dpapi": "^1.0.0",
-    "@tediousjs/connection-string": "^0.4.1",
-    "axios": "^1.2.2",
-    "axios-ntlm": "^1.3.0",
+    "@tediousjs/connection-string": "^0.4.2",
+    "axios": "^1.3.3",
+    "axios-ntlm": "^1.4.1",
     "axios-oauth-client": "^1.5.0",
     "axios-token-interceptor": "^0.2.0",
     "keytar": "^7.9.0",
