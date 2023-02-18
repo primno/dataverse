@@ -1,7 +1,7 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from "@rollup/plugin-typescript";
 import dts from 'rollup-plugin-dts';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import commonJs from '@rollup/plugin-commonjs';
 import pkg from './package.json';
 
@@ -14,19 +14,19 @@ const inputFile = 'src/dataverse-client.ts';
 
 let sourceMap = true;
 
-const additionnalPlugins = [];
+const additionalPlugins = [];
 
 // eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === 'production') {
     sourceMap = false;
-    additionnalPlugins.push(terser())
+    additionalPlugins.push(terser())
 }
 
 const plugins = [
     nodeResolve(),
     commonJs(),
     typescript({ module: "esnext", sourceMap }),
-    ...additionnalPlugins
+    ...additionalPlugins
 ];
 
 export default [
