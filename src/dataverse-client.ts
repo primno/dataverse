@@ -1,5 +1,5 @@
 import { AxiosInstance, Method, AxiosResponse } from "axios";
-import { D365ClientOptions } from "./d365-client-options";
+import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
 import { createWebClient } from "./web-client";
 
@@ -31,12 +31,21 @@ export interface EntityCollection<TModele extends Modele = Modele> {
 
 type Modele = Record<string, any>;
 
-export class D365Client {
+/**
+ * Dataverse client.
+ * Allows to perform CRUD operations on Dataverse / D365 CE (on-premises) entities.
+ */
+export class DataverseClient {
     private client: AxiosInstance | Promise<AxiosInstance>;
     private apiBaseUrl: string;
-    private options: D365ClientOptions;
+    private options: DataverseClientOptions;
 
-    public constructor(connectionString: string, options?: D365ClientOptions) {
+    /**
+     * Creates a new instance of DataverseClient.
+     * @param connectionString Connection string. Supported authentication types: AD, OAuth.
+     * @param options Configuration of DataverseClient.
+     */
+    public constructor(connectionString: string, options?: DataverseClientOptions) {
         this.options = {
             apiVersion: "9.0",
             ...options,

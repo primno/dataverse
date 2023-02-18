@@ -1,7 +1,7 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 import { ConnectionStringProcessor } from "../../../connection-string";
 import { discoverAuthority } from "./authority";
-import { OAuthOptions } from "../../../d365-client-options";
+import { OAuthOptions } from "../../../dataverse-client-options";
 import { convertToOAuth2Credential, OAuth2Config } from "./oauth2-configuration";
 import { createAdfsOAuthClient } from "./adfs";
 import { createMsalClient } from "./msal";

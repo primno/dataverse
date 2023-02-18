@@ -44,9 +44,9 @@ export interface OAuthOptions {
 export type ApiVersion = "9.0" | "9.1" | "9.2";
 
 /**
- * Configuration of D365-Client.
+ * Configuration of Dataverse-Client.
  */
-export interface D365ClientOptions {
+export interface DataverseClientOptions {
     oAuth?: OAuthOptions;
 
     /**

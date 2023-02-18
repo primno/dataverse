@@ -10,7 +10,7 @@ const external = [
     ...Object.keys(pkg.peerDependencies || {})
 ];
 
-const inputFile = 'src/d365-client.ts';
+const inputFile = 'src/dataverse-client.ts';
 
 let sourceMap = true;
 

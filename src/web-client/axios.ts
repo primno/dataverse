@@ -4,7 +4,7 @@ import { HttpsAgentWithRootCA } from "./https-agent";
 import { createNtlmClient } from "./auth/ntlm";
 import { createOAuthClient } from "./auth/oauth";
 import axios, { AxiosRequestConfig } from "axios";
-import { OAuthOptions } from "../d365-client-options";
+import { OAuthOptions } from "../dataverse-client-options";
 
 export async function createWebClient(connectionString: string, options: OAuthOptions) {
     const connectionStringProcessor = new ConnectionStringProcessor(connectionString);

@@ -1,5 +1,5 @@
 import { ConnectionStringProcessor } from "../../../connection-string";
-import { PersistenceOptions } from "../../../d365-client-options";
+import { PersistenceOptions } from "../../../dataverse-client-options";
 import { DiscoveredAuthority } from "./authority";
 
 export interface OAuth2Credentials {

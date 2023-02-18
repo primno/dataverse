@@ -13,6 +13,6 @@ export {
     RetrieveOptions
 } from "./query-options";
 
-export * from "./d365-client-options";
+export * from "./dataverse-client-options";
 
-export { D365Client, EntityCollection } from "./d365-client";
+export { DataverseClient, EntityCollection } from "./dataverse-client";

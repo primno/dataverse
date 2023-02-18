@@ -1,27 +1,27 @@
-# Dynamics 365 Client for Node.JS
+# Dataverse Client for Node.JS
 
-[![npm](https://img.shields.io/npm/v/@primno/d365-client.svg)](https://www.npmjs.com/package/@primno/d365-client)
-[![npm](https://img.shields.io/npm/l/@primno/d365-client.svg)](https://github.com/primno/d365-client/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/@primno/dataverse-client.svg)](https://www.npmjs.com/package/@primno/dataverse-client)
+[![npm](https://img.shields.io/npm/l/@primno/dataverse-client.svg)](https://github.com/primno/dataverse-client/blob/main/LICENSE)
 
-d365-client is a library written in Typescript that allows you to make requests to the Dynamics 365 / Dataverse APIs in Node.JS.
+dataverse-client is a library written in Typescript that allows you to make requests to the Dataverse / Dynamics 365 APIs in Node.JS.
 
-Dynamics 365 CE (on-premises) and Dynamics 365 Online are supported.
+Dynamics 365 Online and Dynamics 365 CE (on-premises) are supported.
 
 Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ only with OAuth enabled).
 
 > **Important**
-> d365-client is in beta stage and subject to change.
+> dataverse-client is in beta stage and subject to change.
 
 ## Installation
-```powershell
-  npm install @primno/d365-client
+```bash
+  npm install @primno/dataverse-client
 ```
 
 ## Authentication
 
-d365-client works with historical connection strings (see [D365 online doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
+dataverse-client works with connection strings (see [Dataverse doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
 
-Persistence token cache is supported for Dynamics 365 Online.
+Persistence token cache is supported for Dataverse.
 
 ### Supported authentication type
 
@@ -33,7 +33,7 @@ Persistence token cache is supported for Dynamics 365 Online.
 
 ### Examples :
 
-Dynamics 365 Online : `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;Password=<Password>`
+Dataverse : `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;Password=<Password>`
 
 Dynamics 365 CE (on-premise) OAuth : `AuthType=OAuth;RedirectUri=<RedirectUri>;ClientSecret=<ClientSecret>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>`
 
@@ -48,7 +48,7 @@ CRUD and execute operations are supported.
 1. Retrieves first 10 accounts.
 
     ```ts
-    import { D365Client } from '@primno/d365-client';
+    import { DataverseClient } from '@primno/dataverse-client';
 
     interface Account {
         name: string;
@@ -56,9 +56,9 @@ CRUD and execute operations are supported.
     }
 
     const connectionString = '...';
-    const d365Client = new D365Client(connectionString);
+    const client = new DataverseClient(connectionString);
 
-    const accounts = await d365Client.retrieveMultipleRecords<Account>(
+    const accounts = await client.retrieveMultipleRecords<Account>(
         "accounts",
         {
             top: 10,
