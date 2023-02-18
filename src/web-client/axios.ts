@@ -6,7 +6,7 @@ import { createOAuthClient } from "./auth/oauth";
 import axios, { AxiosRequestConfig } from "axios";
 import { OAuthOptions } from "../d365-client-options";
 
-export async function createAxiosClient(connectionString: string, options: OAuthOptions) {
+export async function createWebClient(connectionString: string, options: OAuthOptions) {
     const connectionStringProcessor = new ConnectionStringProcessor(connectionString);
     const axiosConfig = {
         baseURL: connectionStringProcessor.serviceUri,

@@ -1,4 +1,4 @@
-import { DeviceCodeResponse } from "./axios-d365/auth/oauth/oauth2-configuration";
+import { DeviceCodeResponse } from "./web-client/auth/oauth/oauth2-configuration";
 
 export interface PersistenceOptionsEnabled {
     /**

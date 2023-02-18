@@ -1,7 +1,7 @@
 import { AxiosInstance, Method, AxiosResponse } from "axios";
-import { createAxiosClient } from "./axios-d365";
-import { D365ClientOptions, OAuthOptions } from "./d365-client-options";
+import { D365ClientOptions } from "./d365-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
+import { createWebClient } from "./web-client";
 
 interface ErrorResponse {
     errorCode: number;
@@ -32,7 +32,7 @@ export interface EntityCollection<TModele extends Modele = Modele> {
 type Modele = Record<string, any>;
 
 export class D365Client {
-    private axiosClient: AxiosInstance | Promise<AxiosInstance>;
+    private client: AxiosInstance | Promise<AxiosInstance>;
     private apiBaseUrl: string;
     private options: D365ClientOptions;
 
@@ -51,11 +51,11 @@ export class D365Client {
         };
 
         this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`
-        this.axiosClient = createAxiosClient(connectionString, this.options.oAuth!);
+        this.client = createWebClient(connectionString, this.options.oAuth!);
     }
 
-    private async getAxiosClient() {
-        return await this.axiosClient;
+    private async getClient() {
+        return await this.client;
     }
 
     private readonly defaultHeaders = {
@@ -76,7 +76,7 @@ export class D365Client {
     private async request(requestOptions: RequestOptions): Promise<AxiosResponse> {
         const { method, uri, data, headers } = requestOptions;
 
-        const client = await this.getAxiosClient();
+        const client = await this.getClient();
         try {
             const result = await client.request({
                 method: method,
