@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
+    "noEmitOnError": false,
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "Node",
@@ -8,7 +9,6 @@
     "strict": true,
     "strictNullChecks": true,
     "alwaysStrict": true,
-    "experimentalDecorators": true,
     "outDir": "build",
     "declaration": true,
     "emitDeclarationOnly": true,
