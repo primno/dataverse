@@ -1,5 +1,5 @@
+import https from "https";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { HttpsAgentWithRootCA } from "../../../https-agent";
 import { OAuth2Config } from "../oauth2-configuration";
 import oauth from "axios-oauth-client";
 const tokenProvider = require('axios-token-interceptor');
@@ -11,7 +11,7 @@ export function createAdfsOAuthClient(oAuthOptions: OAuth2Config, axiosConfig: A
     const { credentials } = oAuthOptions;
 
     const oauthClient = axios.create({
-        httpsAgent: new HttpsAgentWithRootCA({ keepAlive: true })
+        httpsAgent: new https.Agent({ keepAlive: true })
     });
 
     const client = axios.create(axiosConfig);

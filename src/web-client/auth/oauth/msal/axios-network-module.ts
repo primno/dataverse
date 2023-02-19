@@ -3,8 +3,8 @@ import {
     NetworkRequestOptions,
     NetworkResponse,
 } from "@azure/msal-common";
+import https from "https";
 import axios, { AxiosRequestConfig } from "axios";
-import { HttpsAgentWithRootCA } from "../../../https-agent";
 
 /**
  * This class implements the API for network requests.
@@ -27,7 +27,7 @@ export class AxiosNetworkModule implements INetworkModule {
             method: "get",
             url: url,
             headers: options && options.headers,
-            httpsAgent: new HttpsAgentWithRootCA()
+            httpsAgent: new https.Agent()
         };
 
         const response = await axios(request);
@@ -52,7 +52,7 @@ export class AxiosNetworkModule implements INetworkModule {
             url: url,
             data: (options && options.body) || "",
             headers: options && options.headers,
-            httpsAgent: new HttpsAgentWithRootCA()
+            httpsAgent: new https.Agent()
         };
 
         const response = await axios(request);

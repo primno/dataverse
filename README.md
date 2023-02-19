@@ -122,6 +122,18 @@ CRUD and execute operations are supported.
     });
     ```
 
+## Troubleshooting
+
+### Unable to verify the first certificate
+
+On `on-premises` environments, you may have this error :
+
+```
+Error: unable to verify the first certificate
+```
+
+To fix this issue, you can add your enterprise CA certificate to the trusted root certificate authorities by setting the `NODE_EXTRA_CA_CERTS` environment variable. See [Node.js documentation](https://nodejs.org/api/cli.html#cli_node_extra_ca_certs_file) for more information.
+
 ## Credits
 
 Thanks to [HSO](https://github.com/hso-nn/d365-cli) for query options.
