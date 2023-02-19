@@ -144,6 +144,14 @@ export class ConnectionStringProcessor {
         this._redirectUri = takeFirstNotNullOrEmpty(parsed, RedirectUri);
         this._domain = takeFirstNotNullOrEmpty(parsed, Domain);
         this._authType = this.parseAuthenticationType(takeFirstNotNullOrEmpty(parsed, AuthType));
+        this._tokenCacheStorePath = takeFirstNotNullOrEmpty(parsed, TokenCacheStorePath);
+        this._certStoreName = takeFirstNotNullOrEmpty(parsed, CertStoreName);
+        this._certThumbprint = takeFirstNotNullOrEmpty(parsed, CertThumbprint);
+        this._homeRealmUri = takeFirstNotNullOrEmpty(parsed, HomeRealmUri);
+        this._requireNewInstance = takeFirstNotNullOrEmpty(parsed, RequireNewInstance);
+        this._loginPrompt = takeFirstNotNullOrEmpty(parsed, LoginPrompt);
+        this._skipDiscovery = takeFirstNotNullOrEmpty(parsed, SkipDiscovery);
+        this._integratedSecurity = takeFirstNotNullOrEmpty(parsed, IntegratedSecurity);
 
         if (this._authType == AuthenticationType.OAuth && isNullOrEmpty(this._clientId) && isNullOrEmpty(this._redirectUri)) {
             this._clientId = sampleClientId;

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosInstance } from "axios";
 import { OAuth2Config } from "../oauth2-configuration";
-import { getToken } from "./token";
+import { getTokenProvider } from "./token/provider";
 
 /**
  * Create a axios client that uses MSAL to get an access token
@@ -10,8 +10,10 @@ import { getToken } from "./token";
  */
 export function createMsalClient(oauthOptions: OAuth2Config, axiosConfig: AxiosRequestConfig): AxiosInstance {
     const client = axios.create(axiosConfig);
+    const tokenProvider = getTokenProvider(oauthOptions);
+
     client.interceptors.request.use(async (config) => {
-        const accessToken = await getToken(oauthOptions);
+        const accessToken = await tokenProvider.getToken();
         if (accessToken) {
             if (config.headers != null) {
                 // HACK: Fix axios header problem. See #5416 in axios repo

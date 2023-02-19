@@ -3,22 +3,21 @@ import https from "https";
 import { AuthenticationType, ConnectionStringProcessor } from "../connection-string";
 import { createNtlmClient } from "./auth/ntlm";
 import { createOAuthClient } from "./auth/oauth";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import { OAuthOptions } from "../dataverse-client-options";
 
 export async function createWebClient(connectionString: string, options: OAuthOptions) {
-    const connectionStringProcessor = new ConnectionStringProcessor(connectionString);
+    const connectStringProc = new ConnectionStringProcessor(connectionString);
+
     const axiosConfig = {
-        baseURL: connectionStringProcessor.serviceUri,
+        baseURL: connectStringProc.serviceUri,
         httpsAgent: new https.Agent({ keepAlive: true }),
-        httpAgent: new http.Agent({ keepAlive: true }),
-        //validateStatus: () => true
+        httpAgent: new http.Agent({ keepAlive: true })
     } as AxiosRequestConfig;
 
-    switch (connectionStringProcessor.authType) {
-        case AuthenticationType.AD:     return createNtlmClient(connectionStringProcessor, axiosConfig);
-        case AuthenticationType.OAuth:  return await createOAuthClient(connectionStringProcessor, axiosConfig, options);
-
-        default: return axios.create(axiosConfig);
+    switch (connectStringProc.authType) {
+        case AuthenticationType.AD: return createNtlmClient(connectStringProc, axiosConfig);
+        case AuthenticationType.OAuth: return await createOAuthClient(connectStringProc, axiosConfig, options);
+        default: throw new Error("Unsupported authentication type");
     }
 }

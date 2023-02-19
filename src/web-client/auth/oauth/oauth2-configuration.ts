@@ -42,15 +42,20 @@ export interface OAuth2Config {
 }
 
 function getGrantType(connectionString: ConnectionStringProcessor) {
-    // if (connectionString.clientSecret) {
-    //     return "client_credential";
-    // }
-    if (connectionString.userName && connectionString.password) {
+    if (connectionString.certStoreName != null || connectionString.certThumbprint != null) {
+        throw new Error("Certificate authentication is not supported");
+    }
+
+    if (connectionString.userName != null &&
+        connectionString.password != null) {
         return "password";
     }
-    else {
-        return "device_code";
+
+    if (connectionString.clientSecret != null) {
+        return "client_credential";
     }
+    
+    return "device_code";
 }
 
 export function convertToOAuth2Credential(
@@ -60,10 +65,9 @@ export function convertToOAuth2Credential(
 ): OAuth2Credentials {
     return {
         client_id: connectionString.clientId as string,
-        // TODO: Support client_credentials
         grant_type: getGrantType(connectionString),
-        username: connectionString.userName as string,
-        password: connectionString.password as string,
+        username: connectionString.userName,
+        password: connectionString.password,
         redirect_uri: connectionString.redirectUri,
         client_secret: connectionString.clientSecret,
         scope: `${authority.resource}${msal ? '/.default' : ''}`,
