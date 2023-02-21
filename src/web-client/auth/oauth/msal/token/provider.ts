@@ -32,12 +32,12 @@ abstract class MsalTokenProvider implements TokenProvider {
 
     abstract acquireToken(client: ClientApplication): Promise<AuthenticationResult | null>;
 
-    private async tryGetAccountFromCache(username: string): Promise<AccountInfo | undefined> {
+    private async tryGetAccountFromCache(username: string | undefined): Promise<AccountInfo | undefined> {
         if (this.application?.type === "public") {
             const tokenCache = this.application.client.getTokenCache();
             const accounts = await tokenCache.getAllAccounts();
 
-            return accounts.find(a => a.username.toLocaleLowerCase() === username!.toLocaleLowerCase());   
+            return accounts.find(a => a.username.toLocaleLowerCase() === username?.toLocaleLowerCase());   
         }
     }
 
@@ -46,7 +46,7 @@ abstract class MsalTokenProvider implements TokenProvider {
 
         const { scope, username } = this.oAuthOptions.credentials;
 
-        const account = await this.tryGetAccountFromCache(username!);
+        const account = await this.tryGetAccountFromCache(username);
 
         if (account != null) {
             const result = await client.acquireTokenSilent(
@@ -78,6 +78,10 @@ class DeviceCodeTokenProvider extends MsalTokenProvider {
     constructor(oAuthOptions: OAuth2Config) {
         if (oAuthOptions.deviceCodeCallback == null) {
             throw new Error("Device code callback is required for device code flow");
+        }
+
+        if (oAuthOptions.credentials.username == null) {
+            throw new Error("Username is required for device code flow to prevent multiple device code requests");
         }
 
         super(oAuthOptions, ["public"]);

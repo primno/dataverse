@@ -36,7 +36,7 @@ type Modele = Record<string, any>;
  * Allows to perform CRUD operations on Dataverse / D365 CE (on-premises) entities.
  */
 export class DataverseClient {
-    private client: AxiosInstance | Promise<AxiosInstance>;
+    private client: AxiosInstance | Promise<AxiosInstance> | undefined;
     private apiBaseUrl: string;
     private options: DataverseClientOptions;
 
@@ -45,7 +45,7 @@ export class DataverseClient {
      * @param connectionString Connection string. Supported authentication types: AD, OAuth.
      * @param options Configuration of DataverseClient.
      */
-    public constructor(connectionString: string, options?: DataverseClientOptions) {
+    public constructor(private connectionString: string, options?: DataverseClientOptions) {
         this.options = {
             apiVersion: "9.0",
             ...options,
@@ -60,10 +60,13 @@ export class DataverseClient {
         };
 
         this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`;
-        this.client = createWebClient(connectionString, this.options.oAuth!);
     }
 
     private async getClient() {
+        if (this.client == null) {
+            this.client = createWebClient(this.connectionString, this.options.oAuth!);
+        }
+        
         return await this.client;
     }
 

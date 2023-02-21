@@ -1,4 +1,4 @@
-import { ConnectionStringProcessor } from "../../../connection-string";
+import { ConnectionStringProcessor, LoginPromptType } from "../../../connection-string";
 import { PersistenceOptions } from "../../../dataverse-client-options";
 import { DiscoveredAuthority } from "./authority";
 
@@ -54,8 +54,14 @@ function getGrantType(connectionString: ConnectionStringProcessor) {
     if (connectionString.clientSecret != null) {
         return "client_credential";
     }
-    
-    return "device_code";
+
+    if (connectionString.loginPrompt == null ||
+        connectionString.loginPrompt === LoginPromptType.Always ||
+        connectionString.loginPrompt === LoginPromptType.Auto) {
+        return "device_code";
+    }
+
+    throw new Error("Unable to choose a grant type");
 }
 
 export function convertToOAuth2Credential(

@@ -26,6 +26,12 @@ export enum AuthenticationType {
     ClientSecret
 }
 
+export enum LoginPromptType {
+    Auto,
+    Always,
+    Never
+}
+
 const sampleClientId = "51f81489-12ee-4a9e-aaae-a2591f45987d";
 const sampleRedirectUrl = "app://58145B91-0C36-4500-8554-080854F2AC97";
 
@@ -91,9 +97,9 @@ export class ConnectionStringProcessor {
         return this._tokenCacheStorePath;
     }
 
-    private _loginPrompt?: string;
+    private _loginPrompt?: LoginPromptType;
 
-    public get loginPrompt(): string | undefined {
+    public get loginPrompt(): LoginPromptType | undefined {
         return this._loginPrompt;
     }
 
@@ -149,7 +155,7 @@ export class ConnectionStringProcessor {
         this._certThumbprint = takeFirstNotNullOrEmpty(parsed, CertThumbprint);
         this._homeRealmUri = takeFirstNotNullOrEmpty(parsed, HomeRealmUri);
         this._requireNewInstance = takeFirstNotNullOrEmpty(parsed, RequireNewInstance);
-        this._loginPrompt = takeFirstNotNullOrEmpty(parsed, LoginPrompt);
+        this._loginPrompt = this.parseLoginPrompt(takeFirstNotNullOrEmpty(parsed, LoginPrompt));
         this._skipDiscovery = takeFirstNotNullOrEmpty(parsed, SkipDiscovery);
         this._integratedSecurity = takeFirstNotNullOrEmpty(parsed, IntegratedSecurity);
 
@@ -170,6 +176,14 @@ export class ConnectionStringProcessor {
                                "CRM.DYNAMICS.CN", "DYNAMICS-INT.COM"];
 
         return onlineDomains.some(d => host?.endsWith(d));
+    }
+
+    private parseLoginPrompt(loginPrompt?: string): LoginPromptType | undefined {
+        switch (loginPrompt?.toLowerCase()) {
+            case "auto": return LoginPromptType.Auto;
+            case "always": return LoginPromptType.Always;
+            case "never": return LoginPromptType.Never;
+        }
     }
 
     private parseAuthenticationType(authType?: string): AuthenticationType | undefined {
