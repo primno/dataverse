@@ -30,7 +30,8 @@
     "@rollup/plugin-terser": "^0.4.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.14.0",
-    "rollup": "^3.17.1"
+    "rollup": "^3.17.1",
+    "tslib": "^2.5.0"
   },
   "eslintIgnore": [
     "build",

@@ -39,9 +39,15 @@ export async function createApplication(oAuthOptions: OAuth2Config): Promise<App
     };
 
     if (credentials.client_secret) {
-        return new ConfidentialClientApplication(options) as any;
+        return {
+            type: "confidential",
+            client: new ConfidentialClientApplication(options)
+        };
     }
     else {
-        return new PublicClientApplication(options) as any;
+        return {
+            type: "public",
+            client: new PublicClientApplication(options)
+        };
     }
 }

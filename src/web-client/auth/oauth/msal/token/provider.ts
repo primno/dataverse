@@ -1,46 +1,54 @@
-import { AuthenticationResult, IConfidentialClientApplication, IPublicClientApplication } from "@azure/msal-node";
+import { AccountInfo, AuthenticationResult, IConfidentialClientApplication, IPublicClientApplication } from "@azure/msal-node";
 import { OAuth2Config } from "../../oauth2-configuration";
 import { Application, createApplication } from "./application";
+
+type ClientApplication = IConfidentialClientApplication | IPublicClientApplication;
 
 export interface TokenProvider {
     getToken(): Promise<string>;
 }
 
-abstract class MsalTokenProvider<T extends IConfidentialClientApplication | IPublicClientApplication> implements TokenProvider {
-    private client: T | undefined;
+abstract class MsalTokenProvider implements TokenProvider {
+    private application: Application | undefined;
 
     constructor(
         protected oAuthOptions: OAuth2Config,
         protected supportedApplication: Application["type"][]) {
     }
 
-    protected async getClient(): Promise<T> {
-        if (this.client == null) {
+    protected async getClient(): Promise<ClientApplication> {
+        if (this.application == null) {
             const application = await createApplication(this.oAuthOptions);
+
             if (!this.supportedApplication.includes(application.type)) {
                 throw new Error(`Unsupported application type: ${application.type}`);
             }
 
-            this.client = application.client as any;
+            this.application = application;
         }
 
-        return this.client!;
+        return this.application.client;
     }
 
-    abstract acquireToken(client: T): Promise<AuthenticationResult | null>;
+    abstract acquireToken(client: ClientApplication): Promise<AuthenticationResult | null>;
+
+    private async tryGetAccountFromCache(username: string): Promise<AccountInfo | undefined> {
+        if (this.application?.type === "public") {
+            const tokenCache = this.application.client.getTokenCache();
+            const accounts = await tokenCache.getAllAccounts();
+
+            return accounts.find(a => a.username.toLocaleLowerCase() === username!.toLocaleLowerCase());   
+        }
+    }
 
     public async getToken(): Promise<string> {
         const client = await this.getClient();
 
-        try {
-            const { scope, username } = this.oAuthOptions.credentials;
+        const { scope, username } = this.oAuthOptions.credentials;
 
-            const tokenCache = client.getTokenCache();
-            const accounts = await tokenCache.getAllAccounts();
-    
-            // TODO: Fix
-            const account = accounts.find(a => a.username.toLocaleLowerCase() === username!.toLocaleLowerCase());
-    
+        const account = await this.tryGetAccountFromCache(username!);
+
+        if (account != null) {
             const result = await client.acquireTokenSilent(
                 {
                     scopes: [scope!],
@@ -54,7 +62,7 @@ abstract class MsalTokenProvider<T extends IConfidentialClientApplication | IPub
 
             return result.accessToken;
         }
-        catch (except) {
+        else {
             const result = await this.acquireToken(client);
 
             if (result == null) {
@@ -66,7 +74,7 @@ abstract class MsalTokenProvider<T extends IConfidentialClientApplication | IPub
     }
 }
 
-class DeviceCodeTokenProvider extends MsalTokenProvider<IPublicClientApplication> {
+class DeviceCodeTokenProvider extends MsalTokenProvider {
     constructor(oAuthOptions: OAuth2Config) {
         if (oAuthOptions.deviceCodeCallback == null) {
             throw new Error("Device code callback is required for device code flow");
@@ -86,7 +94,7 @@ class DeviceCodeTokenProvider extends MsalTokenProvider<IPublicClientApplication
     }
 }
 
-class UserPasswordTokenProvider extends MsalTokenProvider<IConfidentialClientApplication | IPublicClientApplication> {
+class UserPasswordTokenProvider extends MsalTokenProvider {
     constructor(oAuthOptions: OAuth2Config) {
         if (oAuthOptions.credentials.username == null || oAuthOptions.credentials.password == null) {
             throw new Error("Username and password are required for password flow");
@@ -106,7 +114,7 @@ class UserPasswordTokenProvider extends MsalTokenProvider<IConfidentialClientApp
     }
 }
 
-class ClientCredentialTokenProvider extends MsalTokenProvider<IConfidentialClientApplication> {
+class ClientCredentialTokenProvider extends MsalTokenProvider {
     constructor(oAuthOptions: OAuth2Config) {
         if (oAuthOptions.credentials.client_id == null || oAuthOptions.credentials.client_secret == null) {
             throw new Error("Client ID and secret are required for client credential flow");
