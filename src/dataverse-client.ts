@@ -59,7 +59,7 @@ export class DataverseClient {
             }
         };
 
-        this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`
+        this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`;
         this.client = createWebClient(connectionString, this.options.oAuth!);
     }
 

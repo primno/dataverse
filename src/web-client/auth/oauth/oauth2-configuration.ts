@@ -60,8 +60,7 @@ function getGrantType(connectionString: ConnectionStringProcessor) {
 
 export function convertToOAuth2Credential(
     connectionString: ConnectionStringProcessor,
-    authority: DiscoveredAuthority,
-    msal: boolean
+    authority: DiscoveredAuthority
 ): OAuth2Credentials {
     return {
         client_id: connectionString.clientId as string,
@@ -70,9 +69,7 @@ export function convertToOAuth2Credential(
         password: connectionString.password,
         redirect_uri: connectionString.redirectUri,
         client_secret: connectionString.clientSecret,
-        scope: `${authority.resource}${msal ? '/.default' : ''}`,
-        url: msal ?
-            authority.authority.replace("oauth2/authorize", "").replace("common", "organizations") :
-            authority.authority.replace("oauth2/authorize", "oauth2/token")
+        scope: `${authority.resource}/.default`,
+        url: authority.authority.replace("oauth2/authorize", "").replace("common", "organizations")
     };
 }

@@ -21,8 +21,6 @@
     "@tediousjs/connection-string": "^0.4.2",
     "axios": "^1.3.3",
     "axios-ntlm": "^1.4.1",
-    "axios-oauth-client": "^1.5.0",
-    "axios-token-interceptor": "^0.2.0",
     "keytar": "^7.9.0",
     "uri-js": "^4.4.1"
   },

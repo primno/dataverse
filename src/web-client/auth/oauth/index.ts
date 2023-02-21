@@ -3,7 +3,6 @@ import { ConnectionStringProcessor } from "../../../connection-string";
 import { discoverAuthority } from "./authority";
 import { OAuthOptions } from "../../../dataverse-client-options";
 import { convertToOAuth2Credential, OAuth2Config } from "./oauth2-configuration";
-import { createAdfsOAuthClient } from "./adfs";
 import { createMsalClient } from "./msal";
 
 /**
@@ -16,7 +15,7 @@ export async function createOAuthClient(
     options: OAuthOptions
 ): Promise<AxiosInstance> {
     const authority = await discoverAuthority(axiosConfig);
-    const credentials = convertToOAuth2Credential(connectionString, authority, connectionString.isOnline == true);
+    const credentials = convertToOAuth2Credential(connectionString, authority);
 
     const oAuthOptions: OAuth2Config = {
         credentials,
@@ -24,10 +23,5 @@ export async function createOAuthClient(
         deviceCodeCallback: options.deviceCodeCallback
     };
 
-    if (connectionString.isOnline) {
-        return createMsalClient(oAuthOptions, axiosConfig);
-    }
-    else {
-        return createAdfsOAuthClient(oAuthOptions, axiosConfig);
-    }
+    return createMsalClient(oAuthOptions, axiosConfig);
 }
