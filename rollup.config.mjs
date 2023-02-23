@@ -9,7 +9,7 @@ const external = [
     ...Object.keys(pkg.peerDependencies || {})
 ];
 
-const inputFile = 'src/dataverse-client.ts';
+const inputFile = 'src/index.ts';
 
 let sourceMap = true;
 

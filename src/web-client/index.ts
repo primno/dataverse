@@ -1,1 +1,0 @@
-export { createWebClient } from "./axios";

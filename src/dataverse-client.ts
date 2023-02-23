@@ -1,7 +1,7 @@
 import { AxiosInstance, Method, AxiosResponse } from "axios";
 import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
-import { createWebClient } from "./web-client";
+import { Auth } from "./auth";
 
 interface ErrorResponse {
     errorCode: number;
@@ -42,21 +42,16 @@ export class DataverseClient {
 
     /**
      * Creates a new instance of DataverseClient.
-     * @param connectionString Connection string. Supported authentication types: AD, OAuth.
+     * @param auth Connection string. Supported authentication types: AD, OAuth.
      * @param options Configuration of DataverseClient.
      */
-    public constructor(private connectionString: string, options?: DataverseClientOptions) {
+    public constructor(
+        private auth: Auth,
+        options?: DataverseClientOptions
+    ) {
         this.options = {
             apiVersion: "9.0",
-            ...options,
-
-            oAuth: {
-                persistence: {
-                    enabled: false,
-                    ...options?.oAuth?.persistence
-                },
-                ...options?.oAuth,
-            }
+            ...options
         };
 
         this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`;
@@ -64,9 +59,9 @@ export class DataverseClient {
 
     private async getClient() {
         if (this.client == null) {
-            this.client = createWebClient(this.connectionString, this.options.oAuth!);
+            this.client = await this.auth.createClient();
         }
-        
+
         return await this.client;
     }
 
@@ -82,7 +77,7 @@ export class DataverseClient {
     }
 
     private getMaxPageSizeHeader(maxPageSize: number) {
-        return {"Prefer": `odata.maxpagesize=${maxPageSize}`};
+        return { "Prefer": `odata.maxpagesize=${maxPageSize}` };
     }
 
     private async request(requestOptions: RequestOptions): Promise<AxiosResponse> {
@@ -102,7 +97,7 @@ export class DataverseClient {
             if (except.isAxiosError) {
                 const data = except.response.data;
                 if (data.error != null) {
-                    const errorResponse = data.error as ErrorResponse
+                    const errorResponse = data.error as ErrorResponse;
                     throw new Error(errorResponse.message);
                 }
                 else {

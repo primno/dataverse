@@ -16,3 +16,5 @@ export {
 export * from "./dataverse-client-options";
 
 export { DataverseClient, EntityCollection } from "./dataverse-client";
+
+export * from "./auth";

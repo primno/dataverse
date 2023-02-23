@@ -20,10 +20,10 @@ export async function createApplication(oAuthOptions: OAuth2Config): Promise<App
 
     const options = {
         auth: {
-            clientId: credentials.client_id,
-            authority: credentials.url,
-            clientSecret: credentials.client_secret,
-            knownAuthorities: [credentials.url]
+            clientId: credentials.clientId,
+            authority: credentials.authorityUrl,
+            clientSecret: credentials.clientSecret,
+            knownAuthorities: [credentials.authorityUrl]
         },
         system: {
             networkClient: new AxiosNetworkModule(),
@@ -38,7 +38,7 @@ export async function createApplication(oAuthOptions: OAuth2Config): Promise<App
         cache: persistence.enabled ? await getCacheOptions(persistence) : undefined
     };
 
-    if (credentials.client_secret) {
+    if (credentials.clientSecret) {
         return {
             type: "confidential",
             client: new ConfidentialClientApplication(options)

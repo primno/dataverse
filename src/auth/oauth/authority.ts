@@ -1,16 +1,16 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { isNullOrEmpty } from "../../../utils/common";
+import { isNullOrEmpty } from "../../utils/common";
 
-export interface DiscoveredAuthority {
+export interface Authority {
     authority: string; 
     resource?: string;
 }
 
-export async function discoverAuthority(axiosConfig: AxiosRequestConfig): Promise<DiscoveredAuthority> {
+export async function discoverAuthority(url: string): Promise<Authority> {
     const wwwAuthenticate = "www-authenticate";
     const bearer = "Bearer";
 
-    const client = axios.create(axiosConfig);
+    const client = axios.create({ baseURL: url });
     // SDKClientVersion ensures that the WWW-Authenticate header contains authorization_uri
     const response = await client.get("api/discovery/?SDKClientVersion=9.1", {
         validateStatus: () => true,
