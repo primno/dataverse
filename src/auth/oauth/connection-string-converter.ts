@@ -1,6 +1,6 @@
 import { ConnectionStringProcessor, LoginPromptType } from "../../connection-string";
 import { Authority } from "./authority";
-import { OAuth2Credentials } from "./oauth2-configuration";
+import { OAuth2Credentials } from "./oauth-configuration";
 
 function getGrantType(connectionString: ConnectionStringProcessor) {
     if (connectionString.certStoreName != null || connectionString.certThumbprint != null) {

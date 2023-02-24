@@ -1,17 +1,18 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { Auth } from "../auth";
+import axios from "axios";
+import { Auth, WebClient } from "../auth";
+import { AxiosWrapper } from "../axios-wrapper";
 import { getTokenProvider } from "./msal/token/provider";
-import { OAuth2Config } from "./oauth2-configuration";
+import { OAuthConfig } from "./oauth-configuration";
 
 /**
  * Provides OAuth2 authentication.
  */
 export class OAuth implements Auth {
     public constructor(
-        private oAuth2Config: OAuth2Config
+        private oAuth2Config: OAuthConfig
         ) {}
 
-    public async createClient(): Promise<AxiosInstance> {
+    public async createClient(): Promise<WebClient> {
         const client = axios.create({
             baseURL: this.oAuth2Config.url
         });
@@ -29,6 +30,6 @@ export class OAuth implements Auth {
             return config;
         });
 
-        return client;
+        return new AxiosWrapper(client);
     }
 }

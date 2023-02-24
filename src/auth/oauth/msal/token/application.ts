@@ -1,5 +1,5 @@
 import { ConfidentialClientApplication, IConfidentialClientApplication, IPublicClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
-import { OAuth2Config } from "../../oauth2-configuration";
+import { OAuthConfig } from "../../oauth-configuration";
 import { AxiosNetworkModule } from "../axios-network-module";
 import { getCacheOptions } from "./cache";
 
@@ -15,7 +15,7 @@ interface ConfidentialApplication {
 
 export type Application = PublicApplication | ConfidentialApplication;
 
-export async function createApplication(oAuthOptions: OAuth2Config): Promise<Application> {
+export async function createApplication(oAuthOptions: OAuthConfig): Promise<Application> {
     const { credentials, persistence } = oAuthOptions;
 
     const options = {

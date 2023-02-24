@@ -1,19 +1,7 @@
-import { AxiosInstance, Method, AxiosResponse } from "axios";
 import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
 import { Auth } from "./auth";
-
-interface ErrorResponse {
-    errorCode: number;
-    message: string;
-}
-
-interface RequestOptions {
-    method: Method;
-    uri: string;
-    data?: any;
-    headers?: Record<string, string>
-}
+import { RequestOptions, Response, WebClient } from "./auth/auth";
 
 /**
  * Collection of entities.
@@ -36,7 +24,7 @@ type Modele = Record<string, any>;
  * Allows to perform CRUD operations on Dataverse / D365 CE (on-premises) entities.
  */
 export class DataverseClient {
-    private client: AxiosInstance | Promise<AxiosInstance> | undefined;
+    private client: WebClient | Promise<WebClient> | undefined;
     private apiBaseUrl: string;
     private options: DataverseClientOptions;
 
@@ -80,33 +68,22 @@ export class DataverseClient {
         return { "Prefer": `odata.maxpagesize=${maxPageSize}` };
     }
 
-    private async request(requestOptions: RequestOptions): Promise<AxiosResponse> {
-        const { method, uri, data, headers } = requestOptions;
+    private async request(requestOptions: RequestOptions): Promise<Response> {
+        const { method, url, data, headers } = requestOptions;
 
         const client = await this.getClient();
+
         try {
             const result = await client.request({
                 method: method,
-                url: `${this.apiBaseUrl}${uri}`,
+                url: `${this.apiBaseUrl}${url}`,
                 data: data,
                 headers: { ...this.defaultHeaders, ...headers }
             });
             return result;
         }
         catch (except: any) {
-            if (except.isAxiosError) {
-                const data = except.response.data;
-                if (data.error != null) {
-                    const errorResponse = data.error as ErrorResponse;
-                    throw new Error(errorResponse.message);
-                }
-                else {
-                    throw new Error(JSON.stringify(data));
-                }
-            }
-            else {
-                throw new Error(except);
-            }
+            throw new Error(except);
         }
     }
 
@@ -117,8 +94,16 @@ export class DataverseClient {
      * @param options Selected fields.
      * @returns The record
      */
-    public async retrieveRecord<TModele extends Modele = Modele>(entitySetName: string, id: string, options?: RetrieveOptions): Promise<TModele> {
-        const result = await this.request({ method: "get", uri: `${entitySetName}(${id})${convertRetrieveOptionsToString(options)}` });
+    public async retrieveRecord<TModele extends Modele = Modele>(
+        entitySetName: string,
+        id: string,
+        options?: RetrieveOptions
+    ): Promise<TModele> {
+        const result = await this.request({
+            method: "get",
+            url: `${entitySetName}(${id})${convertRetrieveOptionsToString(options)}`
+        });
+
         return result.data;
     }
 
@@ -144,10 +129,14 @@ export class DataverseClient {
     ): Promise<EntityCollection<TModele>> {
         const result = await this.request({
             method: "get",
-            uri: `${entitySetName}${convertRetrieveMultipleOptionsToString(options)}`,
+            url: `${entitySetName}${convertRetrieveMultipleOptionsToString(options)}`,
             headers: maxPageSize == null ? undefined : this.getMaxPageSizeHeader(maxPageSize)
         });
-        return { entities: result.data.value, nextLink: result.data["@odata.nextLink"]?.replace(/.+\?/, "?") };
+
+        return {
+            entities: result.data.value,
+            nextLink: result.data["@odata.nextLink"]?.replace(/.+\?/, "?")
+        };
     }
 
     /**
@@ -156,13 +145,17 @@ export class DataverseClient {
      * @param data Record to create.
      * @returns Created record.
      */
-    public async createRecord<TModele extends Modele = Modele>(entitySetName: string, data: TModele): Promise<TModele> {
+    public async createRecord<TModele extends Modele = Modele>(
+        entitySetName: string,
+        data: TModele
+    ): Promise<TModele> {
         const result = await this.request({
             method: "post",
-            uri: entitySetName,
+            url: entitySetName,
             data,
             headers: this.preferRepresentationHeaders
         });
+
         return result.data;
     }
 
@@ -176,10 +169,11 @@ export class DataverseClient {
     public async updateRecord<TModele extends Modele = Modele>(entitySetName: string, id: string, data?: TModele): Promise<TModele> {
         const result = await this.request({
             method: "patch",
-            uri: `${entitySetName}(${id})`,
+            url: `${entitySetName}(${id})`,
             data,
             headers: this.preferRepresentationHeaders
         });
+
         return result.data;
     }
 
@@ -189,11 +183,19 @@ export class DataverseClient {
      * @param id Guid of the record you want to delete.
      */
     public async deleteRecord(entitySetName: string, id: string) {
-        await this.request({ method: "delete", uri: `${entitySetName}(${encodeURIComponent(id)})` });
+        await this.request({
+            method: "delete",
+            url: `${entitySetName}(${encodeURIComponent(id)})`
+        });
     }
 
     public async executeAction(actionName: string, data: Record<string, any>) {
-        const result = await this.request({ method: "post", uri: actionName, data });
+        const result = await this.request({
+            method: "post",
+            url: actionName,
+            data
+        });
+
         return result;
     }
 }

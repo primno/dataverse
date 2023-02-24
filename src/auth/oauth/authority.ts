@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { isNullOrEmpty } from "../../utils/common";
 
 export interface Authority {

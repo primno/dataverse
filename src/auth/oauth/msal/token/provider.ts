@@ -1,5 +1,5 @@
 import { AccountInfo, AuthenticationResult, IConfidentialClientApplication, IPublicClientApplication } from "@azure/msal-node";
-import { OAuth2Config } from "../../oauth2-configuration";
+import { OAuthConfig } from "../../oauth-configuration";
 import { Application, createApplication } from "./application";
 
 type ClientApplication = IConfidentialClientApplication | IPublicClientApplication;
@@ -12,7 +12,7 @@ abstract class MsalTokenProvider implements TokenProvider {
     private application: Application | undefined;
 
     constructor(
-        protected oAuthOptions: OAuth2Config,
+        protected oAuthOptions: OAuthConfig,
         protected supportedApplication: Application["type"][]) {
     }
 
@@ -75,7 +75,7 @@ abstract class MsalTokenProvider implements TokenProvider {
 }
 
 class DeviceCodeTokenProvider extends MsalTokenProvider {
-    constructor(oAuthOptions: OAuth2Config) {
+    constructor(oAuthOptions: OAuthConfig) {
         if (oAuthOptions.deviceCodeCallback == null) {
             throw new Error("Device code callback is required for device code flow");
         }
@@ -99,7 +99,7 @@ class DeviceCodeTokenProvider extends MsalTokenProvider {
 }
 
 class UserPasswordTokenProvider extends MsalTokenProvider {
-    constructor(oAuthOptions: OAuth2Config) {
+    constructor(oAuthOptions: OAuthConfig) {
         if (oAuthOptions.credentials.userName == null || oAuthOptions.credentials.password == null) {
             throw new Error("Username and password are required for password flow");
         }
@@ -119,7 +119,7 @@ class UserPasswordTokenProvider extends MsalTokenProvider {
 }
 
 class ClientCredentialTokenProvider extends MsalTokenProvider {
-    constructor(oAuthOptions: OAuth2Config) {
+    constructor(oAuthOptions: OAuthConfig) {
         if (oAuthOptions.credentials.clientId == null || oAuthOptions.credentials.clientSecret == null) {
             throw new Error("Client ID and secret are required for client credential flow");
         }
@@ -136,7 +136,7 @@ class ClientCredentialTokenProvider extends MsalTokenProvider {
     }
 }
 
-export function getTokenProvider(oAuthOptions: OAuth2Config): TokenProvider {
+export function getTokenProvider(oAuthOptions: OAuthConfig): TokenProvider {
     switch (oAuthOptions.credentials.grantType) {
         case "device_code":
             return new DeviceCodeTokenProvider(oAuthOptions);

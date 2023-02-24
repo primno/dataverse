@@ -46,7 +46,7 @@ interface PersistenceOptionsOff {
 
 export type PersistenceOptions = PersistenceOptionsOn | PersistenceOptionsOff;
 
-export interface OAuth2Config {
+export interface OAuthConfig {
     /**
      * The OAuth2 credentials
      */

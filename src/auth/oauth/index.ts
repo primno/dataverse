@@ -1,3 +1,3 @@
-export { OAuth } from "./oauth-auth";
+export { OAuth } from "./oauth";
 export { discoverAuthority } from "./authority";
-export {  DeviceCodeResponse, OAuth2Config, OAuth2Credentials, PersistenceOptions } from "./oauth2-configuration";
+export {  DeviceCodeResponse, OAuthConfig as OAuth2Config, OAuth2Credentials, PersistenceOptions } from "./oauth-configuration";

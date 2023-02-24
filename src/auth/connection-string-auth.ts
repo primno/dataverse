@@ -1,7 +1,6 @@
 import { AuthenticationType, ConnectionStringProcessor } from "../connection-string";
 import { NtlmAuth, convertToNetworkCredential } from "./ntlm";
-import { AxiosInstance, AxiosRequestConfig } from "axios";
-import { Auth } from "./auth";
+import { Auth, WebClient } from "./auth";
 import { discoverAuthority } from "./oauth/authority";
 import { OAuth, OAuth2Config, PersistenceOptions } from "./oauth";
 import { DeviceCodeResponse } from "@azure/msal-common";
@@ -74,7 +73,7 @@ export class ConnectionStringAuth implements Auth {
         return this.authenticator;
     }
 
-    public async createClient(): Promise<AxiosInstance> {
+    public async createClient(): Promise<WebClient> {
         const authenticator = await this.getAuthenticator();
         return authenticator.createClient();
     }
