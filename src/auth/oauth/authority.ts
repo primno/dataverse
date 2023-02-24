@@ -2,7 +2,7 @@ import axios from "axios";
 import { isNullOrEmpty } from "../../utils/common";
 
 export interface Authority {
-    authority: string; 
+    authUrl: string; 
     resource?: string;
 }
 
@@ -36,7 +36,7 @@ export async function discoverAuthority(url: string): Promise<Authority> {
 
         if (!isNullOrEmpty(authUri)) {
             return {
-                authority: authUri,
+                authUrl: authUri,
                 resource: resource
             };
         }

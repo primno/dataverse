@@ -11,7 +11,7 @@ import { convertToOAuth2Credential } from "./oauth/connection-string-converter";
  */
 interface OAuth2Options {
     /**
-     * The persistence options
+     * Persistence options
      */
     persistence: PersistenceOptions;
 
@@ -39,6 +39,14 @@ export class ConnectionStringAuth implements Auth {
 
     constructor(private connectionString: string, private options: ConnectionStringOptions) {
         this.csp = new ConnectionStringProcessor(this.connectionString);
+
+        if (this.csp.serviceUri == null) {
+            throw new Error("Service URI is missing");
+        }
+
+        if (this.csp.authType == null) {
+            throw new Error("Authentication type is missing");
+        }
     }
 
     private async getAuthenticator(): Promise<Auth> {

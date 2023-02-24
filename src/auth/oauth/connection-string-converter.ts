@@ -29,6 +29,10 @@ export function convertToOAuth2Credential(
     connectionString: ConnectionStringProcessor,
     authority: Authority
 ): OAuth2Credentials {
+    if (connectionString.clientId == null) {
+        throw new Error("Connection string is missing client id");
+    }
+
     return {
         clientId: connectionString.clientId as string,
         grantType: getGrantType(connectionString),
@@ -37,6 +41,6 @@ export function convertToOAuth2Credential(
         redirectUri: connectionString.redirectUri,
         clientSecret: connectionString.clientSecret,
         scope: `${authority.resource}/.default`,
-        authorityUrl: authority.authority.replace("oauth2/authorize", "").replace("common", "organizations")
+        authorityUrl: authority.authUrl.replace("oauth2/authorize", "").replace("common", "organizations")
     };
 }

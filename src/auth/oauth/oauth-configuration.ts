@@ -48,12 +48,12 @@ export type PersistenceOptions = PersistenceOptionsOn | PersistenceOptionsOff;
 
 export interface OAuthConfig {
     /**
-     * The OAuth2 credentials
+     * OAuth2 credentials
      */
     credentials: OAuth2Credentials;
 
     /**
-     * The persistence options
+     * Persistence options
      */
     persistence: PersistenceOptions;
 

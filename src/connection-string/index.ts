@@ -142,6 +142,7 @@ export class ConnectionStringProcessor {
     public constructor(connectionString: string) {
         const parsed = parseConnectionString(connectionString) as Record<string, string>;
 
+        this._authType = this.parseAuthenticationType(takeFirstNotNullOrEmpty(parsed, AuthType));
         this._serviceUri = takeFirstNotNullOrEmpty(parsed, ServiceUri);
         this._userName = takeFirstNotNullOrEmpty(parsed, UserName);
         this._password = takeFirstNotNullOrEmpty(parsed, Password);
@@ -149,7 +150,6 @@ export class ConnectionStringProcessor {
         this._clientSecret = takeFirstNotNullOrEmpty(parsed, ClientSecret);
         this._redirectUri = takeFirstNotNullOrEmpty(parsed, RedirectUri);
         this._domain = takeFirstNotNullOrEmpty(parsed, Domain);
-        this._authType = this.parseAuthenticationType(takeFirstNotNullOrEmpty(parsed, AuthType));
         this._tokenCacheStorePath = takeFirstNotNullOrEmpty(parsed, TokenCacheStorePath);
         this._certStoreName = takeFirstNotNullOrEmpty(parsed, CertStoreName);
         this._certThumbprint = takeFirstNotNullOrEmpty(parsed, CertThumbprint);
