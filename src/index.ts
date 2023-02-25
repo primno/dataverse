@@ -17,4 +17,5 @@ export * from "./dataverse-client-options";
 
 export { DataverseClient, EntityCollection } from "./dataverse-client";
 
+export * from "./connection-string";
 export * from "./auth";

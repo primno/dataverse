@@ -23,10 +23,12 @@ export interface PersistenceOptionsOn {
      * Enable persistence. Default: false.
      */
     enabled: true;
+    
     /**
-     * Cache directory.
+     * Cache path.
      */
-    cacheDirectory: string;
+    cachePath: string;
+
     /**
      * Service name.
      */

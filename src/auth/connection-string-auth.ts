@@ -1,10 +1,19 @@
-import { AuthenticationType, ConnectionStringProcessor } from "../connection-string";
+import { AuthenticationType, ConnectionString } from "../connection-string";
 import { NtlmAuth, convertToNetworkCredential } from "./ntlm";
 import { Auth, WebClient } from "./auth";
 import { discoverAuthority } from "./oauth/authority";
-import { OAuth, OAuth2Config, PersistenceOptions } from "./oauth";
+import { OAuth, OAuth2Config } from "./oauth";
 import { DeviceCodeResponse } from "@azure/msal-common";
 import { convertToOAuth2Credential } from "./oauth/connection-string-converter";
+
+/**
+ * Persistence options.
+ * Persistence is enabled when `AuthType` is `OAuth` and `TokenCacheStorePath` is set in connection string.
+ */
+interface PersistenceOptions {
+    serviceName: string;
+    accountName: string;
+}
 
 /**
  * Options for OAuth2 authentication
@@ -24,21 +33,37 @@ interface OAuth2Options {
 }
 
 /**
- * Options for connection string authentication
+ * Options for connection string authentication.
  */
 export interface ConnectionStringOptions {
     oAuth: OAuth2Options;
 }
 
 /**
- * Authentication using connection string
+ * Authentication using connection string.
  */
 export class ConnectionStringAuth implements Auth {
-    private csp: ConnectionStringProcessor;
+    private csp: ConnectionString;
     private authenticator: Auth | undefined;
 
-    constructor(private connectionString: string, private options: ConnectionStringOptions) {
-        this.csp = new ConnectionStringProcessor(this.connectionString);
+    /**
+     * Creates a new instance of ConnectionStringAuth.
+     * Supported authentication types: AD, OAuth.
+     * @param connectionString Connection string as string or ConnectionString object.
+     * @param options Options for connection string authentication.
+     */
+    constructor(
+        connectionString: string | ConnectionString,
+        private options: ConnectionStringOptions
+    ) {
+        if (typeof connectionString === "string") {
+            this.csp = new ConnectionString(connectionString);
+        } else if (connectionString instanceof ConnectionString) {
+            this.csp = connectionString;
+        }
+        else {
+            throw new Error("Invalid connection string");
+        }
 
         if (this.csp.serviceUri == null) {
             throw new Error("Service URI is missing");
@@ -50,7 +75,7 @@ export class ConnectionStringAuth implements Auth {
     }
 
     private async getAuthenticator(): Promise<Auth> {
-        if (!this.authenticator) {
+        if (this.authenticator == null) {
             switch (this.csp.authType) {
                 case AuthenticationType.AD:
                     {
@@ -67,7 +92,12 @@ export class ConnectionStringAuth implements Auth {
                         const credentials = convertToOAuth2Credential(this.csp, authority);
                         const options: OAuth2Config = {
                             credentials,
-                            persistence: this.options.oAuth.persistence,
+                            persistence: {
+                                // Persistence is enabled only when the cache path is specified
+                                enabled: this.csp.tokenCacheStorePath != null,
+                                cachePath: this.csp.tokenCacheStorePath!,
+                                ...this.options.oAuth.persistence
+                            },
                             deviceCodeCallback: this.options.oAuth.deviceCodeCallback,
                             url: this.csp.serviceUri as string
                         };

@@ -35,136 +35,60 @@ export enum LoginPromptType {
 const sampleClientId = "51f81489-12ee-4a9e-aaae-a2591f45987d";
 const sampleRedirectUrl = "app://58145B91-0C36-4500-8554-080854F2AC97";
 
-export class ConnectionStringProcessor {
-
-    private _serviceUri?: string;
-
-    public get serviceUri(): string | undefined {
-        return this._serviceUri;
-    }
-
-    private _userName?: string;
-
-    public get userName(): string | undefined {
-        return this._userName;
-    }
-
-    private _password?: string;
-
-    public get password(): string | undefined {
-        return this._password;
-    }
-
-    private _domain?: string;
-
-    public get domain(): string | undefined {
-        return this._domain;
-    }
-
-    private _homeRealmUri?: string;
-
-    public get homeRealmUri(): string | undefined {
-        return this._homeRealmUri;
-    }
-
-    private _authType?: AuthenticationType;
-
-    public get authType(): AuthenticationType | undefined {
-        return this._authType;
-    }
-
-    private _requireNewInstance?: string;
-
-    public get requireNewInstance(): string | undefined {
-        return this._requireNewInstance;
-    }
-
-    private _clientId?: string;
-
-    public get clientId(): string | undefined {
-        return this._clientId;
-    }
-
-    private _redirectUri?: string;
-
-    public get redirectUri(): string | undefined {
-        return this._redirectUri;
-    }
-
-    private _tokenCacheStorePath?: string;
-
-    public get tokenCacheStorePath(): string | undefined {
-        return this._tokenCacheStorePath;
-    }
-
-    private _loginPrompt?: LoginPromptType;
-
-    public get loginPrompt(): LoginPromptType | undefined {
-        return this._loginPrompt;
-    }
-
-    private _certStoreName?: string;
-
-    public get certStoreName(): string | undefined {
-        return this._certStoreName;
-    }
-
-    private _certThumbprint?: string;
-
-    public get certThumbprint(): string | undefined {
-        return this._certThumbprint;
-    }
-
-    private _skipDiscovery?: string;
-
-    public get skipDiscovery(): string | undefined {
-        return this._skipDiscovery;
-    }
-
-    private _integratedSecurity?: string;
-
-    public get integratedSecurity(): string | undefined {
-        return this._integratedSecurity;
-    }
-
-    private _clientSecret?: string;
-
-    public get clientSecret(): string | undefined {
-        return this._clientSecret;
-    }
-
-    private _isOnline?: boolean;
+export class ConnectionString {
+    public serviceUri?: string;
+    public userName?: string;
+    public password?: string;
+    public domain?: string;
+    public homeRealmUri?: string;
+    public authType?: AuthenticationType;
+    public requireNewInstance?: boolean;
+    public clientId?: string;
+    public redirectUri?: string;
+    public tokenCacheStorePath?: string;
+    public loginPrompt?: LoginPromptType;
+    public certThumbprint?: string;
+    public certStoreName?: string;
+    public skipDiscovery?: boolean;
+    public integratedSecurity?: string;
+    public clientSecret?: string;
 
     public get isOnline(): boolean | undefined {
-        return this._isOnline;
+        return this.isOnlineUri(this.serviceUri as string)
     }
 
     public constructor(connectionString: string) {
         const parsed = parseConnectionString(connectionString) as Record<string, string>;
 
-        this._authType = this.parseAuthenticationType(takeFirstNotNullOrEmpty(parsed, AuthType));
-        this._serviceUri = takeFirstNotNullOrEmpty(parsed, ServiceUri);
-        this._userName = takeFirstNotNullOrEmpty(parsed, UserName);
-        this._password = takeFirstNotNullOrEmpty(parsed, Password);
-        this._clientId = takeFirstNotNullOrEmpty(parsed, ClientId);
-        this._clientSecret = takeFirstNotNullOrEmpty(parsed, ClientSecret);
-        this._redirectUri = takeFirstNotNullOrEmpty(parsed, RedirectUri);
-        this._domain = takeFirstNotNullOrEmpty(parsed, Domain);
-        this._tokenCacheStorePath = takeFirstNotNullOrEmpty(parsed, TokenCacheStorePath);
-        this._certStoreName = takeFirstNotNullOrEmpty(parsed, CertStoreName);
-        this._certThumbprint = takeFirstNotNullOrEmpty(parsed, CertThumbprint);
-        this._homeRealmUri = takeFirstNotNullOrEmpty(parsed, HomeRealmUri);
-        this._requireNewInstance = takeFirstNotNullOrEmpty(parsed, RequireNewInstance);
-        this._loginPrompt = this.parseLoginPrompt(takeFirstNotNullOrEmpty(parsed, LoginPrompt));
-        this._skipDiscovery = takeFirstNotNullOrEmpty(parsed, SkipDiscovery);
-        this._integratedSecurity = takeFirstNotNullOrEmpty(parsed, IntegratedSecurity);
+        this.authType = this.parseAuthenticationType(takeFirstNotNullOrEmpty(parsed, AuthType));
+        this.serviceUri = takeFirstNotNullOrEmpty(parsed, ServiceUri);
+        this.userName = takeFirstNotNullOrEmpty(parsed, UserName);
+        this.password = takeFirstNotNullOrEmpty(parsed, Password);
+        this.clientId = takeFirstNotNullOrEmpty(parsed, ClientId);
+        this.clientSecret = takeFirstNotNullOrEmpty(parsed, ClientSecret);
+        this.redirectUri = takeFirstNotNullOrEmpty(parsed, RedirectUri);
+        this.domain = takeFirstNotNullOrEmpty(parsed, Domain);
+        this.tokenCacheStorePath = takeFirstNotNullOrEmpty(parsed, TokenCacheStorePath);
+        this.certStoreName = takeFirstNotNullOrEmpty(parsed, CertStoreName);
+        this.certThumbprint = takeFirstNotNullOrEmpty(parsed, CertThumbprint);
+        this.homeRealmUri = takeFirstNotNullOrEmpty(parsed, HomeRealmUri);
+        this.requireNewInstance = this.parseBoolean(takeFirstNotNullOrEmpty(parsed, RequireNewInstance));
+        this.loginPrompt = this.parseLoginPrompt(takeFirstNotNullOrEmpty(parsed, LoginPrompt));
+        this.skipDiscovery = this.parseBoolean(takeFirstNotNullOrEmpty(parsed, SkipDiscovery));
+        this.integratedSecurity = takeFirstNotNullOrEmpty(parsed, IntegratedSecurity);
 
-        if (this._authType == AuthenticationType.OAuth && isNullOrEmpty(this._clientId) && isNullOrEmpty(this._redirectUri)) {
-            this._clientId = sampleClientId;
-            this._redirectUri = sampleRedirectUrl;
+        if (this.authType == AuthenticationType.OAuth && isNullOrEmpty(this.clientId) && isNullOrEmpty(this.redirectUri)) {
+            this.clientId = sampleClientId;
+            this.redirectUri = sampleRedirectUrl;
+        }
+    }
+
+    private parseBoolean(value?: string): boolean | undefined {
+        if (value == null) {
+            return undefined;
         }
 
-        this._isOnline = this.isOnlineUri(this.serviceUri as string);
+        return value.toLowerCase() === "true";
     }
 
     private isOnlineUri(uri: string): boolean {

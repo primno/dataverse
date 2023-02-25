@@ -1,8 +1,8 @@
-import { ConnectionStringProcessor, LoginPromptType } from "../../connection-string";
+import { ConnectionString, LoginPromptType } from "../../connection-string";
 import { Authority } from "./authority";
 import { OAuth2Credentials } from "./oauth-configuration";
 
-function getGrantType(connectionString: ConnectionStringProcessor) {
+function getGrantType(connectionString: ConnectionString) {
     if (connectionString.certStoreName != null || connectionString.certThumbprint != null) {
         throw new Error("Certificate authentication is not supported");
     }
@@ -26,7 +26,7 @@ function getGrantType(connectionString: ConnectionStringProcessor) {
 }
 
 export function convertToOAuth2Credential(
-    connectionString: ConnectionStringProcessor,
+    connectionString: ConnectionString,
     authority: Authority
 ): OAuth2Credentials {
     if (connectionString.clientId == null) {

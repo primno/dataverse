@@ -1,7 +1,7 @@
 import { NtlmCredentials } from "axios-ntlm";
-import { ConnectionStringProcessor } from "../../connection-string";
+import { ConnectionString } from "../../connection-string";
 
-export function convertToNetworkCredential(connectionString: ConnectionStringProcessor): NtlmCredentials {
+export function convertToNetworkCredential(connectionString: ConnectionString): NtlmCredentials {
     if (connectionString.userName == null || connectionString.password == null || connectionString.domain == null) {
         throw new Error("Connection string is missing username, password or domain");
     }
