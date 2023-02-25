@@ -19,10 +19,29 @@ const SkipDiscovery = ["SkipDiscovery"];
 const IntegratedSecurity = ["Integrated Security"];
 const ClientSecret = ["ClientSecret" , "Secret"];
 
+/**
+ * Authentication type.
+ */
 export enum AuthenticationType {
+    /**
+     * Active Directory authentication.
+     */
     AD,
+    /**
+     * OAuth authentication.
+     */
     OAuth,
+    /**
+     * Unsupported.
+     */
+    Office365,
+    /**
+     * Unsupported.
+     */
     Certificate,
+    /**
+     * Unsupported.
+     */
     ClientSecret
 }
 
@@ -36,25 +55,79 @@ const sampleClientId = "51f81489-12ee-4a9e-aaae-a2591f45987d";
 const sampleRedirectUrl = "app://58145B91-0C36-4500-8554-080854F2AC97";
 
 export class ConnectionString {
+    /**
+     * Url to the Dataverse / D365 environment.
+     */
     public serviceUri?: string;
+
+    /**
+     * User identification name.
+     */
     public userName?: string;
+
+    /**
+     * Password for the user name.
+     */
     public password?: string;
+
+    /**
+     * Domain for the user. Used for AD authentication.
+     */
     public domain?: string;
+
     public homeRealmUri?: string;
+
+    /**
+     * Authentication type.
+     * AD and OAuth are supported.
+     */
     public authType?: AuthenticationType;
+
     public requireNewInstance?: boolean;
+
+    /**
+     * Client id for OAuth authentication.
+     */
     public clientId?: string;
+
+    /**
+     * Redirect url for OAuth authentication.
+     */
     public redirectUri?: string;
+
+    /**
+     * Path to the token cache file.
+     * Used for OAuth authentication only.
+     */
     public tokenCacheStorePath?: string;
+
     public loginPrompt?: LoginPromptType;
     public certThumbprint?: string;
     public certStoreName?: string;
     public skipDiscovery?: boolean;
     public integratedSecurity?: string;
+
+    /**
+     * Client secret for OAuth authentication.
+     */
     public clientSecret?: string;
 
+    /**
+     * Indicates if the connection string is for online environment.
+     */
     public get isOnline(): boolean | undefined {
-        return this.isOnlineUri(this.serviceUri as string)
+        if (isNullOrEmpty(this.serviceUri)) {
+            return undefined;
+        }
+
+        const parsedUri = uriParse(this.serviceUri);
+        const host = parsedUri.host?.toUpperCase();
+
+        const onlineDomains = ["DYNAMICS.COM", "MICROSOFTDYNAMICS.DE",
+                               "MICROSOFTDYNAMICS.US", "APPSPLATFORM.US",
+                               "CRM.DYNAMICS.CN", "DYNAMICS-INT.COM"];
+
+        return onlineDomains.some(d => host?.endsWith(d));
     }
 
     public constructor(connectionString: string) {
@@ -91,17 +164,6 @@ export class ConnectionString {
         return value.toLowerCase() === "true";
     }
 
-    private isOnlineUri(uri: string): boolean {
-        const parsedUri = uriParse(uri);
-        const host = parsedUri.host?.toUpperCase();
-
-        const onlineDomains = ["DYNAMICS.COM", "MICROSOFTDYNAMICS.DE",
-                               "MICROSOFTDYNAMICS.US", "APPSPLATFORM.US",
-                               "CRM.DYNAMICS.CN", "DYNAMICS-INT.COM"];
-
-        return onlineDomains.some(d => host?.endsWith(d));
-    }
-
     private parseLoginPrompt(loginPrompt?: string): LoginPromptType | undefined {
         switch (loginPrompt?.toLowerCase()) {
             case "auto": return LoginPromptType.Auto;
@@ -115,6 +177,7 @@ export class ConnectionString {
             case "oauth": return AuthenticationType.OAuth;
             case "certificate": return AuthenticationType.Certificate;
             case "clientsecret": return AuthenticationType.ClientSecret;
+            case "office365": return AuthenticationType.Office365;
             case "ad": return AuthenticationType.AD;
         }
     }
