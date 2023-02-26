@@ -1,5 +1,5 @@
 import axios from "axios";
-import { isNullOrEmpty } from "../../utils/common";
+import { isNullOrEmpty } from "../../../utils/common";
 
 export interface Authority {
     authUrl: string; 

@@ -1,13 +1,13 @@
 import { AxiosRequestConfig, NtlmClient, NtlmCredentials } from "axios-ntlm";
-import { Auth, WebClient } from "../auth";
-import { AxiosWrapper } from "../axios-wrapper";
+import { AxiosClientWrapper } from "../../axios-client-wrapper";
+import { ClientProvider, WebClient } from "../../client-provider";
 
 export interface NtlmOptions {
     credentials: NtlmCredentials;
     url: string;
 }
 
-export class NtlmAuth implements Auth {
+export class NtlmClientProvider implements ClientProvider {
     private axiosConfig: AxiosRequestConfig;
 
     public constructor(private options: NtlmOptions) {
@@ -17,6 +17,6 @@ export class NtlmAuth implements Auth {
     }
 
     public createClient(): WebClient {
-        return new AxiosWrapper(NtlmClient(this.options.credentials, this.axiosConfig));
+        return new AxiosClientWrapper(NtlmClient(this.options.credentials, this.axiosConfig));
     }
 }

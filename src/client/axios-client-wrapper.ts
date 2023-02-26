@@ -1,12 +1,12 @@
 import { AxiosInstance } from "axios";
-import { RequestOptions, Response, WebClient } from "./auth";
+import { RequestOptions, WebClient, Response } from "./client-provider";
 
 interface ErrorResponse {
     errorCode: number;
     message: string;
 }
 
-export class AxiosWrapper implements WebClient {
+export class AxiosClientWrapper implements WebClient {
     public constructor(private client: AxiosInstance) {}
 
     public async request(config: RequestOptions): Promise<Response> {

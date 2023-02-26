@@ -1,13 +1,13 @@
 import axios from "axios";
-import { Auth, WebClient } from "../auth";
-import { AxiosWrapper } from "../axios-wrapper";
+import { AxiosClientWrapper } from "../../axios-client-wrapper";
+import { ClientProvider, WebClient } from "../../client-provider";
 import { getTokenProvider } from "./msal/token/provider";
 import { OAuthConfig } from "./oauth-configuration";
 
 /**
  * Provides OAuth2 authentication.
  */
-export class OAuth implements Auth {
+export class OAuthClientProvider implements ClientProvider {
     public constructor(
         private oAuth2Config: OAuthConfig
         ) {}
@@ -30,6 +30,6 @@ export class OAuth implements Auth {
             return config;
         });
 
-        return new AxiosWrapper(client);
+        return new AxiosClientWrapper(client);
     }
 }

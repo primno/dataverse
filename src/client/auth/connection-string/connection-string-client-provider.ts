@@ -1,10 +1,11 @@
-import { AuthenticationType, ConnectionString } from "../connection-string";
-import { NtlmAuth, convertToNetworkCredential } from "./ntlm";
-import { Auth, WebClient } from "./auth";
-import { discoverAuthority } from "./oauth/authority";
-import { OAuth, OAuth2Config } from "./oauth";
+import { NtlmClientProvider } from "../ntlm";
+import { discoverAuthority } from "../oauth/authority";
+import { OAuthClientProvider, OAuth2Config } from "../oauth";
 import { DeviceCodeResponse } from "@azure/msal-common";
-import { convertToOAuth2Credential } from "./oauth/connection-string-converter";
+import { convertToOAuth2Credential } from "./converter/oauth-converter";
+import { ClientProvider, WebClient } from "../../client-provider";
+import { AuthenticationType, ConnectionString } from "./connection-string";
+import { convertToNetworkCredential } from "./converter/ntlm-converter";
 
 /**
  * Persistence options.
@@ -40,14 +41,14 @@ export interface ConnectionStringOptions {
 }
 
 /**
- * Authentication using connection string.
+ * Provides web client for connection string authentication.
  */
-export class ConnectionStringAuth implements Auth {
+export class ConnStringClientProvider implements ClientProvider {
     private csp: ConnectionString;
-    private authenticator: Auth | undefined;
+    private provider: ClientProvider | undefined;
 
     /**
-     * Creates a new instance of ConnectionStringAuth.
+     * Creates a new instance of ConnStringClientProvider.
      * Supported authentication types: AD, OAuth.
      * @param connectionString Connection string as string or ConnectionString object.
      * @param options Options for connection string authentication.
@@ -74,13 +75,13 @@ export class ConnectionStringAuth implements Auth {
         }
     }
 
-    private async getAuthenticator(): Promise<Auth> {
-        if (this.authenticator == null) {
+    private async getAuthenticator(): Promise<ClientProvider> {
+        if (this.provider == null) {
             switch (this.csp.authType) {
                 case AuthenticationType.AD:
                     {
                         const credentials = convertToNetworkCredential(this.csp);
-                        this.authenticator = new NtlmAuth({
+                        this.provider = new NtlmClientProvider({
                             credentials,
                             url: this.csp.serviceUri as string
                         });
@@ -101,14 +102,14 @@ export class ConnectionStringAuth implements Auth {
                             deviceCodeCallback: this.options.oAuth.deviceCodeCallback,
                             url: this.csp.serviceUri as string
                         };
-                        this.authenticator = new OAuth(options);
+                        this.provider = new OAuthClientProvider(options);
                         break;
                     }
                 default: throw new Error("Unsupported authentication type");
             }
         }
 
-        return this.authenticator;
+        return this.provider;
     }
 
     public async createClient(): Promise<WebClient> {

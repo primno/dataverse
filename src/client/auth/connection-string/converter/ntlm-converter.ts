@@ -1,5 +1,5 @@
 import { NtlmCredentials } from "axios-ntlm";
-import { ConnectionString } from "../../connection-string";
+import { ConnectionString } from "../connection-string";
 
 export function convertToNetworkCredential(connectionString: ConnectionString): NtlmCredentials {
     if (connectionString.userName == null || connectionString.password == null || connectionString.domain == null) {
@@ -12,5 +12,3 @@ export function convertToNetworkCredential(connectionString: ConnectionString): 
         domain: connectionString.domain!
     };
 }
-
-export { NtlmAuth } from "./ntlm-auth";

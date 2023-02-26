@@ -17,8 +17,9 @@ export interface WebClient {
 }
 
 /**
- * Provides authentication.
+ * Provides web client.
+ * Can be used to create web client with authentication.
  */
-export interface Auth {
+export interface ClientProvider {
     createClient(): WebClient | Promise<WebClient>;
 }

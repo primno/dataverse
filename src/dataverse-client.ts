@@ -1,7 +1,7 @@
 import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
-import { Auth } from "./auth";
-import { RequestOptions, Response, WebClient } from "./auth/auth";
+import { RequestOptions, Response, WebClient } from "./client";
+import { ClientProvider } from "./client/client-provider";
 
 /**
  * Collection of entities.
@@ -30,11 +30,11 @@ export class DataverseClient {
 
     /**
      * Creates a new instance of DataverseClient.
-     * @param auth Connection string. Supported authentication types: AD, OAuth.
+     * @param clientProvider Client provider. Eg: ConnStringClientProvider, NtlmClientProvider, OAuthClientProvider, etc.
      * @param options Configuration of DataverseClient.
      */
     public constructor(
-        private auth: Auth,
+        private clientProvider: ClientProvider,
         options?: DataverseClientOptions
     ) {
         this.options = {
@@ -47,7 +47,7 @@ export class DataverseClient {
 
     private async getClient() {
         if (this.client == null) {
-            this.client = await this.auth.createClient();
+            this.client = await this.clientProvider.createClient();
         }
 
         return await this.client;

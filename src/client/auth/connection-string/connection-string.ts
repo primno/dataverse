@@ -1,5 +1,5 @@
 import { parseConnectionString } from "@tediousjs/connection-string";
-import { isNullOrEmpty, takeFirstNotNullOrEmpty } from "../utils/common";
+import { isNullOrEmpty, takeFirstNotNullOrEmpty } from "../../../utils/common";
 import { parse as uriParse }  from "uri-js";
 
 const ServiceUri = ["ServiceUri", "Service Uri", "Url", "Server"];
