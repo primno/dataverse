@@ -1,3 +1,3 @@
-export { NtlmClientProvider } from "./ntlm";
-export { OAuthClientProvider } from "./oauth";
+export { NtlmClient } from "./ntlm";
+export { OAuthClient } from "./oauth";
 export * from "./connection-string";

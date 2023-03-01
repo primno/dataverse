@@ -1,9 +1,9 @@
-import { NtlmClientProvider } from "../ntlm";
+import { NtlmClient } from "../ntlm";
 import { discoverAuthority } from "../oauth/authority";
-import { OAuthClientProvider, OAuth2Config } from "../oauth";
+import { OAuthClient, OAuthConfig } from "../oauth";
 import { DeviceCodeResponse } from "@azure/msal-common";
 import { convertToOAuth2Credential } from "./converter/oauth-converter";
-import { ClientProvider, WebClient } from "../../client-provider";
+import { RequestOptions, Response, WebClient } from "../../web-client";
 import { AuthenticationType, ConnectionString } from "./connection-string";
 import { convertToNetworkCredential } from "./converter/ntlm-converter";
 
@@ -43,9 +43,9 @@ export interface ConnectionStringOptions {
 /**
  * Provides web client for connection string authentication.
  */
-export class ConnStringClientProvider implements ClientProvider {
+export class ConnectionStringClient implements WebClient {
     private csp: ConnectionString;
-    private provider: ClientProvider | undefined;
+    private webClient: WebClient | undefined;
 
     /**
      * Creates a new instance of ConnStringClientProvider.
@@ -75,23 +75,22 @@ export class ConnStringClientProvider implements ClientProvider {
         }
     }
 
-    private async getAuthenticator(): Promise<ClientProvider> {
-        if (this.provider == null) {
+    private async getWebClient(): Promise<WebClient> {
+        if (this.webClient == null) {
             switch (this.csp.authType) {
                 case AuthenticationType.AD:
                     {
                         const credentials = convertToNetworkCredential(this.csp);
-                        this.provider = new NtlmClientProvider({
+                        return new NtlmClient({
                             credentials,
                             url: this.csp.serviceUri as string
                         });
-                        break;
                     }
                 case AuthenticationType.OAuth:
                     {
                         const authority = await discoverAuthority(this.csp.serviceUri as string);
                         const credentials = convertToOAuth2Credential(this.csp, authority);
-                        const options: OAuth2Config = {
+                        const options: OAuthConfig = {
                             credentials,
                             persistence: {
                                 // Persistence is enabled only when the cache path is specified
@@ -102,18 +101,16 @@ export class ConnStringClientProvider implements ClientProvider {
                             deviceCodeCallback: this.options.oAuth.deviceCodeCallback,
                             url: this.csp.serviceUri as string
                         };
-                        this.provider = new OAuthClientProvider(options);
-                        break;
+                        return new OAuthClient(options);
                     }
                 default: throw new Error("Unsupported authentication type");
             }
         }
-
-        return this.provider;
+        return this.webClient;
     }
 
-    public async createClient(): Promise<WebClient> {
-        const authenticator = await this.getAuthenticator();
-        return authenticator.createClient();
+    public async request(config: RequestOptions): Promise<Response> {
+        const webClient = await this.getWebClient();
+        return webClient.request(config);
     }
 }

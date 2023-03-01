@@ -15,11 +15,3 @@ export interface Response {
 export interface WebClient {
     request(config: RequestOptions): Promise<Response>;
 }
-
-/**
- * Provides web client.
- * Can be used to create web client with authentication.
- */
-export interface ClientProvider {
-    createClient(): WebClient | Promise<WebClient>;
-}

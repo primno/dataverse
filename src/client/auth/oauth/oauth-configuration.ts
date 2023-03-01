@@ -1,4 +1,4 @@
-export interface OAuth2Credentials {
+export interface OAuthCredentials {
     grantType: "client_credential" | "password" | "device_code";
     clientId: string;
     clientSecret?: string;
@@ -52,7 +52,7 @@ export interface OAuthConfig {
     /**
      * OAuth2 credentials
      */
-    credentials: OAuth2Credentials;
+    credentials: OAuthCredentials;
 
     /**
      * Persistence options

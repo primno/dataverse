@@ -1,1 +1,1 @@
-export { NtlmClientProvider } from "./ntlm-client-provider";
+export { NtlmClient } from "./ntlm-client";

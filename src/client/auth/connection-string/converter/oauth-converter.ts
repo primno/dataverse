@@ -1,5 +1,5 @@
 import { Authority } from "../../oauth/authority";
-import { OAuth2Credentials } from "../../oauth/oauth-configuration";
+import { OAuthCredentials } from "../../oauth/oauth-configuration";
 import { ConnectionString, LoginPromptType } from "../connection-string";
 
 function getGrantType(connectionString: ConnectionString) {
@@ -28,7 +28,7 @@ function getGrantType(connectionString: ConnectionString) {
 export function convertToOAuth2Credential(
     connectionString: ConnectionString,
     authority: Authority
-): OAuth2Credentials {
+): OAuthCredentials {
     if (connectionString.clientId == null) {
         throw new Error("Connection string is missing client id");
     }

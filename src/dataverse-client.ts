@@ -1,7 +1,6 @@
 import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
 import { RequestOptions, Response, WebClient } from "./client";
-import { ClientProvider } from "./client/client-provider";
 
 /**
  * Collection of entities.
@@ -24,17 +23,16 @@ type Modele = Record<string, any>;
  * Allows to perform CRUD operations on Dataverse / D365 CE (on-premises) entities.
  */
 export class DataverseClient {
-    private client: WebClient | Promise<WebClient> | undefined;
     private apiBaseUrl: string;
     private options: DataverseClientOptions;
 
     /**
      * Creates a new instance of DataverseClient.
-     * @param clientProvider Client provider. Eg: ConnStringClientProvider, NtlmClientProvider, OAuthClientProvider, etc.
+     * @param client Web client. Eg: ConnStringClient, NtlmClient, OAuthClient, etc.
      * @param options Configuration of DataverseClient.
      */
     public constructor(
-        private clientProvider: ClientProvider,
+        private client: WebClient,
         options?: DataverseClientOptions
     ) {
         this.options = {
@@ -43,14 +41,6 @@ export class DataverseClient {
         };
 
         this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`;
-    }
-
-    private async getClient() {
-        if (this.client == null) {
-            this.client = await this.clientProvider.createClient();
-        }
-
-        return await this.client;
     }
 
     private readonly defaultHeaders = {
@@ -71,10 +61,8 @@ export class DataverseClient {
     private async request(requestOptions: RequestOptions): Promise<Response> {
         const { method, url, data, headers } = requestOptions;
 
-        const client = await this.getClient();
-
         try {
-            const result = await client.request({
+            const result = await this.client.request({
                 method: method,
                 url: `${this.apiBaseUrl}${url}`,
                 data: data,

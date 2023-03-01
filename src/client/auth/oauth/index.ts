@@ -1,3 +1,3 @@
-export { OAuthClientProvider } from "./oauth-client-provider";
+export { OAuthClient } from "./oauth-client";
 export { discoverAuthority } from "./authority";
-export {  DeviceCodeResponse, OAuthConfig as OAuth2Config, OAuth2Credentials, PersistenceOptions } from "./oauth-configuration";
+export {  DeviceCodeResponse, OAuthConfig, OAuthCredentials, PersistenceOptions } from "./oauth-configuration";

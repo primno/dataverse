@@ -1,15 +1,19 @@
-import { AxiosInstance } from "axios";
-import { RequestOptions, WebClient, Response } from "./client-provider";
+import { RequestOptions, Response, WebClient } from "./web-client";
+import axios, { AxiosInstance, CreateAxiosDefaults } from "axios";
 
-interface ErrorResponse {
+export interface ErrorResponse {
     errorCode: number;
     message: string;
 }
 
-export class AxiosClientWrapper implements WebClient {
-    public constructor(private client: AxiosInstance) {}
+export class AxiosClient implements WebClient {
+    protected readonly client: AxiosInstance;
 
-    public async request(config: RequestOptions): Promise<Response> {
+    public constructor(axiosConfig: CreateAxiosDefaults) {
+        this.client = axios.create(axiosConfig);
+    }
+
+    async request(config: RequestOptions): Promise<Response> {
         try {
             return await this.client.request(config);
         }
