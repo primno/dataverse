@@ -81,10 +81,11 @@ export class ConnectionStringClient implements WebClient {
                 case AuthenticationType.AD:
                     {
                         const credentials = convertToNetworkCredential(this.csp);
-                        return new NtlmClient({
+                        this.webClient = new NtlmClient({
                             credentials,
                             url: this.csp.serviceUri as string
                         });
+                        break;
                     }
                 case AuthenticationType.OAuth:
                     {
@@ -101,7 +102,8 @@ export class ConnectionStringClient implements WebClient {
                             deviceCodeCallback: this.options.oAuth.deviceCodeCallback,
                             url: this.csp.serviceUri as string
                         };
-                        return new OAuthClient(options);
+                        this.webClient = new OAuthClient(options);
+                        break;
                     }
                 default: throw new Error("Unsupported authentication type");
             }
