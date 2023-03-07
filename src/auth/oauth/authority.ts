@@ -3,7 +3,7 @@ import { AxiosClient } from "../../client/axios-client";
 import { isNullOrEmpty } from "../../utils/common";
 
 export interface Authority {
-    authUrl: string; 
+    authUrl: string;
     resource?: string;
 }
 
@@ -48,13 +48,13 @@ export async function discoverAuthority(url: string, client?: WebClient): Promis
                 };
             });
         
-        const authUri = result.find(k => k.key == "authorization_uri")?.value;
+        const authUrl = result.find(k => k.key == "authorization_uri")?.value;
         const resource = result.find(k => k.key == "resource_id")?.value;
 
-        if (!isNullOrEmpty(authUri)) {
+        if (!isNullOrEmpty(authUrl)) {
             return {
-                authUrl: authUri,
-                resource: resource
+                authUrl: authUrl,
+                resource
             };
         }
     }
