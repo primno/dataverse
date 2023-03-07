@@ -15,3 +15,11 @@ export function takeFirstNotNullOrEmpty(record: Record<string, string>, keys: st
         }
     }
 }
+
+export function parseBoolean(value?: string): boolean | undefined {
+    if (value == null) {
+        return undefined;
+    }
+
+    return value.toLowerCase() === "true";
+}

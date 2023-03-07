@@ -1,8 +1,8 @@
 {
-  "name": "@primno/d365-client",
-  "version": "0.6.1-beta.2",
-  "description": "Dynamics 365 Client for Node.JS",
-  "repository": "github:primno/d365-client",
+  "name": "@primno/dataverse-client",
+  "version": "0.8-beta.0",
+  "description": "Dataverse / Dynamics 365 CE (on-premises) client for Node.JS",
+  "repository": "github:primno/dataverse-client",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -10,40 +10,26 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --build",
-    "lint": "eslint . --ext .ts",
-    "bundle:dev": "rollup -c",
-    "bundle:prod": "rollup -c --environment NODE_ENV:production",
-    "watch": "rollup -c -w",
-    "test": "nyc mocha -a -r ts-node/register test/**/*.spec.ts"
+    "build": "rollup -c --environment NODE_ENV:production",
+    "watch": "rollup -c -w"
   },
   "author": "Xavier Monin",
   "license": "MIT",
   "dependencies": {
-    "@azure/msal-node": "^1.14.3",
+    "@azure/msal-node": "^1.15.0",
     "@primno/dpapi": "^1.0.0",
-    "@tediousjs/connection-string": "^0.4.1",
-    "axios": "^1.2.2",
-    "axios-ntlm": "^1.3.0",
-    "axios-oauth-client": "^1.5.0",
-    "axios-token-interceptor": "^0.2.0",
-    "keytar": "^7.9.0",
-    "uri-js": "^4.4.1",
-    "win-ca": "^3.5.0"
+    "@tediousjs/connection-string": "^0.4.2",
+    "axios": "^1.3.4",
+    "keytar": "^7.9.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-typescript": "^9.0.2",
-    "@types/node": "^18.11.9",
-    "eslint": "^8.1.0",
-    "eslint-plugin-node": "^11.1.0",
-    "rollup": "^2.78.0",
-    "rollup-plugin-dts": "^4.2.3",
-    "rollup-plugin-terser": "^7.0.2",
-    "ts-node": "^10.9.1",
-    "tslib": "^2.4.1",
-    "typescript": "^4.9.3"
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/node": "^18.14.0",
+    "rollup": "^3.17.1",
+    "tslib": "^2.5.0"
   },
   "eslintIgnore": [
     "build",
@@ -55,9 +41,10 @@
     "registry": "https://registry.npmjs.org/"
   },
   "keywords": [
+    "dataverse",
     "dynamics",
     "d365",
-    "webapi",
-    "dataverse"
+    "client",
+    "webapi"
   ]
 }

@@ -1,64 +1,257 @@
-# Dynamics 365 Client for Node.JS
+# Dataverse Client for Node.JS
 
-[![npm](https://img.shields.io/npm/v/@primno/d365-client.svg)](https://www.npmjs.com/package/@primno/d365-client)
-[![npm](https://img.shields.io/npm/l/@primno/d365-client.svg)](https://github.com/primno/d365-client/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/@primno/dataverse-client.svg)](https://www.npmjs.com/package/@primno/dataverse-client)
+[![npm](https://img.shields.io/npm/l/@primno/dataverse-client.svg)](https://github.com/primno/dataverse-client/blob/main/LICENSE)
 
-d365-client is a library written in Typescript that allows you to make requests to the Dynamics 365 / Dataverse APIs in Node.JS.
+dataverse-client is library for Node.JS to make WebAPI requests to Dataverse and Dynamics 365 CE (on-premises).
 
-Dynamics 365 CE (on-premises) and Dynamics 365 Online are supported.
-
-Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ only with OAuth enabled).
+dataverse-client provides :
+- [Authentication](#authentication) to Dataverse:
+    - Connection string
+    - OAuth
+    - Your custom token provider.
+- [Query builder](#queries) to build OData queries.
 
 > **Important**
-> d365-client is in beta stage and subject to change.
+> dataverse-client is in beta stage and subject to change.
 
-## Installation
-```powershell
-  npm install @primno/d365-client
+## Compatibility
+
+dataverse-client works with Dataverse (Dynamics 365 Online) and Dynamics 365 CE (on-premises).
+
+Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ with OAuth enabled in deployment settings).
+
+## Quick start
+
+### Installation
+```bash
+  npm install @primno/dataverse-client
+```
+
+### Usage
+
+With connection string authentication:
+
+```ts
+import { DataverseClient, ConnStringTokenProvider } from '@primno/dataverse-client';
+
+const tokenProvider = new ConnStringTokenProvider(
+    "AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;TokenCacheStorePath=./.cache/token.json",
+    {
+        oAuth: {
+            // For persistent token cache on Linux/Mac to store the token in the keychain.
+            // Only used when TokenCacheStorePath is set.
+            persistence: {
+                serviceName: "<serviceName>",
+                accountName: "<accountName>"
+            },
+            // For device code flow
+            deviceCodeCallback: (deviceCode) => {
+                console.log(deviceCode.message);
+            }
+        }
+     }
+);
+const client = new DataverseClient(tokenProvider);
+
+const accounts = await client.retrieveMultipleRecords("accounts", { top: 10 });
+console.log(accounts);
+```
+
+With OAuth:
+
+```ts
+import { DataverseClient, OAuthTokenProvider } from '@primno/dataverse-client';
+
+const tokenProvider = new OAuthTokenProvider({
+    url: "https://<Environment>.crm.dynamics.com",
+    credentials: {
+        clientId: "51f81489-12ee-4a9e-aaae-a2591f45987d", // Sandbox
+        redirectUri: "app://58145B91-0C36-4500-8554-080854F2AC97", // Sandbox
+        authorityUrl: "https://login.microsoftonline.com/common",
+        scope: "https://<Environment>.crm.dynamics.com/.default",
+        grantType: "device_code",
+        userName: "<Username>"
+    },
+    persistence: {
+        enabled: false
+    },
+    deviceCodeCallback: (deviceCode) => {
+        console.log(deviceCode.message);
+    }
+});
+
+const client = new DataverseClient(tokenProvider);
+
+const accounts = await client.retrieveMultipleRecords("accounts", { top: 10 });
+console.log(accounts);
 ```
 
 ## Authentication
 
-d365-client works with historical connection strings (see [D365 online doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
+dataverse-client is provided with 2 authentication providers :
+- Connection string
+- OAuth
 
-Persistence token cache is supported for Dynamics 365 Online.
+You can also implement your own authentication provider by implementing the `TokenProvider` interface.
 
-### Supported authentication type
+### Connection string
 
-| Auth type                          | Online             | On-premises        |
-|------------------------------------|--------------------|--------------------|
-| OAuth                              | :heavy_check_mark: | :heavy_check_mark: |
-| AD                                 | :x:                | :heavy_check_mark: |
-| Certificate                        | :x:                | :x:                |
+`ConnStringTokenProvider` provides a token by using a connection string (see [Dataverse doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
 
-### Examples :
+Only `OAuth` authentication type is supported.
 
-Dynamics 365 Online : `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;Password=<Password>`
+The token can be persisted using the `TokenCacheStorePath` connection string parameter. To learn more about the token cache, see [Token cache](#token-cache).
 
-Dynamics 365 CE (on-premise) OAuth : `AuthType=OAuth;RedirectUri=<RedirectUri>;ClientSecret=<ClientSecret>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>`
+```ts
+const tokenProvider = new ConnStringTokenProvider(
+    "AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;TokenCacheStorePath=./.cache/token.json",
+    {
+        oAuth: {
+            // For persistent token cache on Linux/Mac to store the token in the keychain.
+            // Only used when TokenCacheStorePath is set.
+            persistence: {
+                serviceName: "<serviceName>",
+                accountName: "<accountName>"
+            },
+            // For device code flow. Show the url and code to the user.
+            deviceCodeCallback: (deviceCode) => {
+                console.log(deviceCode.message);
+            }
+        }
+     }
+);
+```
 
-Dynamics 365 CE (on-premise) AD (NTLM authentication): `AuthType=AD;Url=https://<D365Url>;UserName=<AdUserName>;Domain=<Domain>;Password=<Password>`
+#### OAuth flows
+
+`ConnStringTokenProvider` determines which OAuth flow to use based on the parameters in the connection string.
+
+| Parameters | Flow |
+|-----------|------|
+| `UserName` and `Password` | User password |
+| `ClientId` and `ClientSecret` | Client credential |
+| `UserName` only | Device code |
+
+Examples:
+
+| Environment | AuthType | OAuth flow | Connection string |
+|-------------|----------|------------|-------------------|
+| Dataverse   | OAuth    | Device code | `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>` |
+| Dataverse   | OAuth    | User password | `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;Password=<Password>` |
+| Dataverse   | OAuth    | Client credential | `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;ClientId=<ClientId>;ClientSecret=<ClientSecret>;RedirectUri=<RedirectUri>` |
+| On-premises | OAuth    | User password | `AuthType=OAuth;RedirectUri=<RedirectUri>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>` |
+
+### OAuth
+
+`OAuthTokenProvider` provides OAuth authentication.
+
+```ts
+const tokenProvider = new OAuthTokenProvider(options);
+```
+
+Options definition:
+
+```ts
+interface OAuthConfig {
+    /**
+     * OAuth2 credentials
+     */
+    credentials: {
+        grantType: "client_credential" | "password" | "device_code";
+        clientId: string;
+        clientSecret?: string;
+        authorityUrl: string;
+        userName?: string;
+        password?: string;
+        redirectUri?: string;
+        scope?: string;
+    };
+
+    /**
+     * Persistence options
+     */
+    persistence: {
+        /**
+         * Enable persistence. Default: false.
+         */
+        enabled: true;
+        
+        /**
+         * Cache path.
+         */
+        cachePath: string;
+
+        /**
+         * Service name. Only used on Linux/MacOS to store the token in the keychain.
+         */
+        serviceName: string;
+
+        /**
+         * Account name. Only used on Linux/MacOS to store the token in the keychain.
+         */
+        accountName: string;
+    };
+
+    /**
+     * Device code callback. Only used when grant_type is device_code.
+     * @param response The device code response
+     * @returns 
+     */
+    deviceCodeCallback?: (response: DeviceCodeResponse) => void;
+
+    /**
+     * Dataverse / D365 url. Eg: https://org.crm.dynamics.com
+     */
+    url: string;
+}
+```
+
+### Discover authority
+
+To discover the authority url, you can use the `discoverAuthority` method.
+
+```ts
+interface Authority {
+    authUrl: string; 
+    resource?: string;
+}
+
+const authority: Authority = await discoverAuthority("<DataverseOrOnPremisesUrl>");
+```
+
+#### Token cache
+
+The token can be persisted using the `persistence` option.
+
+It is encrypted using `DPAPI` on Windows, `libsecret` on Linux and the `Keychain` on MacOS.
 
 ## Queries
 
-CRUD and execute operations are supported.
+The following methods are available to query Dataverse:
+- `retrieveMultipleRecords`: Retrieves a set of records.
+- `retrieveRecord`: Retrieves a single record by its id.
+- `createRecord`: Creates a record.
+- `updateRecord`: Updates a record by its id.
+- `deleteRecord`: Deletes a record by its id.
+- `executeAction`: Executes an action, function, or workflow.
+
+Retrieve can be done by providing a `RetrieveMultipleOptions` object or a raw query string.
+
+***Note:***
+The name of the entity must be the entity set name (plural).
 
 ### Examples
 
 1. Retrieves first 10 accounts.
 
     ```ts
-    import { D365Client } from '@primno/d365-client';
-
     interface Account {
         name: string;
         emailaddress1: string;
     }
 
-    const connectionString = '...';
-    const d365Client = new D365Client(connectionString);
-
-    const accounts = await d365Client.retrieveMultipleRecords<Account>(
+    const accounts = await client.retrieveMultipleRecords<Account>(
         "accounts",
         {
             top: 10,
@@ -75,6 +268,7 @@ CRUD and execute operations are supported.
         firstname: "Sophie", lastname: "Germain"
     });
     ```
+
 1. Delete a account.
 
     ```ts
@@ -86,7 +280,7 @@ CRUD and execute operations are supported.
     const contact = await client.retrieveRecord("contacts", "00000000-0000-0000-0000-000000000000", { select: ["firstname"] });
     ```
 
-1. Retrieves actives opportunies using a custom query option string.
+1. Retrieves actives opportunities using a custom query option string.
 
     ```ts
     const opportunities = await d365Client.retrieveMultipleRecords("opportunities", "?$select=name,$filter=state eq 0");
@@ -121,6 +315,18 @@ CRUD and execute operations are supported.
         filters: [{ conditions: [{ attribute: "createdon", operator: "ThisMonth" }] }]
     });
     ```
+
+## Troubleshooting
+
+### Unable to verify the first certificate
+
+On `on-premises` environments, you may have this error :
+
+```
+Error: unable to verify the first certificate
+```
+
+To fix this issue, you can add your enterprise CA certificate to the trusted root certificate authorities by setting the `NODE_EXTRA_CA_CERTS` environment variable. See [Node.js documentation](https://nodejs.org/api/cli.html#cli_node_extra_ca_certs_file) for more information.
 
 ## Credits
 

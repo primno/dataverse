@@ -11,8 +11,10 @@ export function convertRetrieveMultipleOptionsToString(options: RetrieveMultiple
                 throw new Error("Query option must start with ?");
             }
             return options;
-        case "object": return convertQueryOptionsToString(options);
-        case "undefined": return EmptyString;
+        case "object":
+            return convertQueryOptionsToString(options);
+        case "undefined":
+            return EmptyString;
         default:
             throw new Error("Invalid retrieve multiple options");
     }

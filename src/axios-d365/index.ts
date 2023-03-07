@@ -1,1 +1,0 @@
-export { createAxiosClient } from "./axios";

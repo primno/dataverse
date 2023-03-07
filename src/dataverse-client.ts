@@ -1,19 +1,8 @@
-import { AxiosInstance, Method, AxiosResponse } from "axios";
-import { createAxiosClient } from "./axios-d365";
-import { D365ClientOptions } from "./d365-client-options";
+import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
-
-interface ErrorResponse {
-    errorCode: number;
-    message: string;
-}
-
-interface RequestOptions {
-    method: Method;
-    uri: string;
-    data?: any;
-    headers?: Record<string, string>
-}
+import { RequestOptions, Response, WebClient } from "./client";
+import { AxiosClient } from "./client/axios-client";
+import { TokenProvider } from "./auth/token-provider";
 
 /**
  * Collection of entities.
@@ -31,28 +20,34 @@ export interface EntityCollection<TModele extends Modele = Modele> {
 
 type Modele = Record<string, any>;
 
-export class D365Client {
-    private axiosClient: AxiosInstance | Promise<AxiosInstance>;
-    private apiBaseUrl: string;
-    private options: D365ClientOptions;
+/**
+ * Dataverse client.
+ * Allows to perform CRUD operations on Dataverse / D365 CE (on-premises) entities.
+ */
+export class DataverseClient {
+    private options: DataverseClientOptions;
+    private client: WebClient;
 
-    public constructor(connectionString: string, options?: D365ClientOptions) {
+    /**
+     * Creates a new instance of DataverseClient.
+     * @param tokenProvider Token provider.
+     * @param options Configuration of DataverseClient.
+     */
+    public constructor(
+        tokenProvider: TokenProvider,
+        options?: DataverseClientOptions
+    ) {
         this.options = {
             apiVersion: "9.0",
-            ...options,
-
-            persistence: {
-                enabled: false,
-                ...options?.persistence
-            }
+            ...options
         };
 
-        this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`
-        this.axiosClient = createAxiosClient(connectionString, this.options);
-    }
+        const apiBaseUrl = `${tokenProvider.url}/api/data/v${this.options.apiVersion}/`;
 
-    private async getAxiosClient() {
-        return await this.axiosClient;
+        this.client = new AxiosClient({
+            baseURL: apiBaseUrl,
+        });
+        this.client.setTokenProvider(tokenProvider);
     }
 
     private readonly defaultHeaders = {
@@ -67,36 +62,23 @@ export class D365Client {
     }
 
     private getMaxPageSizeHeader(maxPageSize: number) {
-        return {"Prefer": `odata.maxpagesize=${maxPageSize}`};
+        return { "Prefer": `odata.maxpagesize=${maxPageSize}` };
     }
 
-    private async request(requestOptions: RequestOptions): Promise<AxiosResponse> {
-        const { method, uri, data, headers } = requestOptions;
+    private async request(requestOptions: RequestOptions): Promise<Response> {
+        const { method, url, data, headers } = requestOptions;
 
-        const client = await this.getAxiosClient();
         try {
-            const result = await client.request({
+            const result = await this.client.request({
                 method: method,
-                url: `${this.apiBaseUrl}${uri}`,
+                url,
                 data: data,
                 headers: { ...this.defaultHeaders, ...headers }
             });
             return result;
         }
         catch (except: any) {
-            if (except.isAxiosError) {
-                const data = except.response.data;
-                if (data.error != null) {
-                    const errorResponse = data.error as ErrorResponse
-                    throw new Error(errorResponse.message);
-                }
-                else {
-                    throw new Error(JSON.stringify(data));
-                }
-            }
-            else {
-                throw new Error(except);
-            }
+            throw new Error(except);
         }
     }
 
@@ -107,8 +89,16 @@ export class D365Client {
      * @param options Selected fields.
      * @returns The record
      */
-    public async retrieveRecord<TModele extends Modele = Modele>(entitySetName: string, id: string, options?: RetrieveOptions): Promise<TModele> {
-        const result = await this.request({ method: "get", uri: `${entitySetName}(${id})${convertRetrieveOptionsToString(options)}` });
+    public async retrieveRecord<TModele extends Modele = Modele>(
+        entitySetName: string,
+        id: string,
+        options?: RetrieveOptions
+    ): Promise<TModele> {
+        const result = await this.request({
+            method: "get",
+            url: `${entitySetName}(${id})${convertRetrieveOptionsToString(options)}`
+        });
+
         return result.data;
     }
 
@@ -134,10 +124,14 @@ export class D365Client {
     ): Promise<EntityCollection<TModele>> {
         const result = await this.request({
             method: "get",
-            uri: `${entitySetName}${convertRetrieveMultipleOptionsToString(options)}`,
+            url: `${entitySetName}${convertRetrieveMultipleOptionsToString(options)}`,
             headers: maxPageSize == null ? undefined : this.getMaxPageSizeHeader(maxPageSize)
         });
-        return { entities: result.data.value, nextLink: result.data["@odata.nextLink"]?.replace(/.+\?/, "?") };
+
+        return {
+            entities: result.data.value,
+            nextLink: result.data["@odata.nextLink"]?.replace(/.+\?/, "?")
+        };
     }
 
     /**
@@ -146,13 +140,17 @@ export class D365Client {
      * @param data Record to create.
      * @returns Created record.
      */
-    public async createRecord<TModele extends Modele = Modele>(entitySetName: string, data: TModele): Promise<TModele> {
+    public async createRecord<TModele extends Modele = Modele>(
+        entitySetName: string,
+        data: TModele
+    ): Promise<TModele> {
         const result = await this.request({
             method: "post",
-            uri: entitySetName,
+            url: entitySetName,
             data,
             headers: this.preferRepresentationHeaders
         });
+
         return result.data;
     }
 
@@ -166,10 +164,11 @@ export class D365Client {
     public async updateRecord<TModele extends Modele = Modele>(entitySetName: string, id: string, data?: TModele): Promise<TModele> {
         const result = await this.request({
             method: "patch",
-            uri: `${entitySetName}(${id})`,
+            url: `${entitySetName}(${id})`,
             data,
             headers: this.preferRepresentationHeaders
         });
+
         return result.data;
     }
 
@@ -179,11 +178,19 @@ export class D365Client {
      * @param id Guid of the record you want to delete.
      */
     public async deleteRecord(entitySetName: string, id: string) {
-        await this.request({ method: "delete", uri: `${entitySetName}(${encodeURIComponent(id)})` });
+        await this.request({
+            method: "delete",
+            url: `${entitySetName}(${encodeURIComponent(id)})`
+        });
     }
 
     public async executeAction(actionName: string, data: Record<string, any>) {
-        const result = await this.request({ method: "post", uri: actionName, data });
+        const result = await this.request({
+            method: "post",
+            url: actionName,
+            data
+        });
+
         return result;
     }
 }
