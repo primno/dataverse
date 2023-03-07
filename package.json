@@ -1,6 +1,6 @@
 {
   "name": "@primno/dataverse-client",
-  "version": "0.7-beta.0",
+  "version": "0.8-beta.0",
   "description": "Dataverse / Dynamics 365 CE (on-premises) client for Node.JS",
   "repository": "github:primno/dataverse-client",
   "main": "dist/index.cjs.js",
@@ -19,7 +19,7 @@
     "@azure/msal-node": "^1.15.0",
     "@primno/dpapi": "^1.0.0",
     "@tediousjs/connection-string": "^0.4.2",
-    "axios": "^1.3.3",
+    "axios": "^1.3.4",
     "keytar": "^7.9.0"
   },
   "devDependencies": {
