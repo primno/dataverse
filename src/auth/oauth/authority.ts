@@ -3,7 +3,14 @@ import { AxiosClient } from "../../client/axios-client";
 import { isNullOrEmpty } from "../../utils/common";
 
 export interface Authority {
+    /**
+     * Authority url.
+     */
     authUrl: string;
+
+    /**
+     * Resource id / scope.
+     */
     resource?: string;
 }
 
@@ -53,7 +60,7 @@ export async function discoverAuthority(url: string, client?: WebClient): Promis
 
         if (!isNullOrEmpty(authUrl)) {
             return {
-                authUrl: authUrl,
+                authUrl,
                 resource
             };
         }

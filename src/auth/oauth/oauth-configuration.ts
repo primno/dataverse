@@ -30,11 +30,12 @@ export interface PersistenceOptionsOn {
     cachePath: string;
 
     /**
-     * Service name.
+     * Service name. Only used on Linux/MacOS to store the token in the keychain.
      */
     serviceName: string;
+
     /**
-     * Account name.
+     * Account name. Only used on Linux/MacOS to store the token in the keychain.
      */
     accountName: string;
 }
