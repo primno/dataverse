@@ -1,12 +1,9 @@
 import { AccountInfo, AuthenticationResult, IConfidentialClientApplication, IPublicClientApplication } from "@azure/msal-node";
+import { TokenProvider } from "../../../token-provider";
 import { OAuthConfig } from "../../oauth-configuration";
 import { Application, createApplication } from "./application";
 
 type ClientApplication = IConfidentialClientApplication | IPublicClientApplication;
-
-export interface TokenProvider {
-    getToken(): Promise<string>;
-}
 
 abstract class MsalTokenProvider implements TokenProvider {
     private application: Application | undefined;
@@ -39,6 +36,10 @@ abstract class MsalTokenProvider implements TokenProvider {
 
             return accounts.find(a => a.username.toLocaleLowerCase() === username?.toLocaleLowerCase());   
         }
+    }
+
+    public get url(): string {
+        return this.oAuthOptions.url;
     }
 
     public async getToken(): Promise<string> {
@@ -74,7 +75,7 @@ abstract class MsalTokenProvider implements TokenProvider {
     }
 }
 
-class DeviceCodeTokenProvider extends MsalTokenProvider {
+export class DeviceCodeTokenProvider extends MsalTokenProvider {
     constructor(oAuthOptions: OAuthConfig) {
         if (oAuthOptions.deviceCodeCallback == null) {
             throw new Error("Device code callback is required for device code flow");
@@ -98,7 +99,7 @@ class DeviceCodeTokenProvider extends MsalTokenProvider {
     }
 }
 
-class UserPasswordTokenProvider extends MsalTokenProvider {
+export class UserPasswordTokenProvider extends MsalTokenProvider {
     constructor(oAuthOptions: OAuthConfig) {
         if (oAuthOptions.credentials.userName == null || oAuthOptions.credentials.password == null) {
             throw new Error("Username and password are required for password flow");
@@ -118,7 +119,7 @@ class UserPasswordTokenProvider extends MsalTokenProvider {
     }
 }
 
-class ClientCredentialTokenProvider extends MsalTokenProvider {
+export class ClientCredentialTokenProvider extends MsalTokenProvider {
     constructor(oAuthOptions: OAuthConfig) {
         if (oAuthOptions.credentials.clientId == null || oAuthOptions.credentials.clientSecret == null) {
             throw new Error("Client ID and secret are required for client credential flow");
@@ -133,18 +134,5 @@ class ClientCredentialTokenProvider extends MsalTokenProvider {
         return await client.acquireTokenByClientCredential({
             scopes: [scope!]
         });
-    }
-}
-
-export function getTokenProvider(oAuthOptions: OAuthConfig): TokenProvider {
-    switch (oAuthOptions.credentials.grantType) {
-        case "device_code":
-            return new DeviceCodeTokenProvider(oAuthOptions);
-        case "password":
-            return new UserPasswordTokenProvider(oAuthOptions);
-        case "client_credential":
-            return new ClientCredentialTokenProvider(oAuthOptions);
-            
-        default: throw new Error("Invalid grant type");
     }
 }

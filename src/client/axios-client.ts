@@ -1,5 +1,6 @@
-import { RequestOptions, Response, WebClient } from "./web-client";
+import { RequestOptions as WebClientRequestOptions, Response as WebClientResponse, WebClient } from "./web-client";
 import axios, { AxiosInstance, CreateAxiosDefaults } from "axios";
+import { TokenProvider } from "../auth/token-provider";
 
 export interface ErrorResponse {
     errorCode: number;
@@ -13,7 +14,20 @@ export class AxiosClient implements WebClient {
         this.client = axios.create(axiosConfig);
     }
 
-    async request(config: RequestOptions): Promise<Response> {
+    public setTokenProvider(tokenProvider: TokenProvider): void {
+        this.client.interceptors.request.use(async (config) => {
+            const token = await tokenProvider.getToken();
+
+            if (token != null && config.headers != null) {
+                // HACK: Fix axios header problem. See #5416 in axios repo
+                (config.headers as any).Authorization = `Bearer ${token}`;
+            }
+
+            return config;
+        });
+    }
+
+    public async request(config: WebClientRequestOptions): Promise<WebClientResponse> {
         try {
             return await this.client.request(config);
         }

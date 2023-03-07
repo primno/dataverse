@@ -1,2 +1,2 @@
 export * from "./web-client";
-export * from "./auth";
+export * from "./axios-client";

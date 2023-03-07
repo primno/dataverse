@@ -1,6 +1,8 @@
 import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
 import { RequestOptions, Response, WebClient } from "./client";
+import { AxiosClient } from "./client/axios-client";
+import { TokenProvider } from "./auth/token-provider";
 
 /**
  * Collection of entities.
@@ -23,16 +25,16 @@ type Modele = Record<string, any>;
  * Allows to perform CRUD operations on Dataverse / D365 CE (on-premises) entities.
  */
 export class DataverseClient {
-    private apiBaseUrl: string;
     private options: DataverseClientOptions;
+    private client: WebClient;
 
     /**
      * Creates a new instance of DataverseClient.
-     * @param client Web client. Eg: ConnStringClient, NtlmClient, OAuthClient, etc.
+     * @param tokenProvider Token provider.
      * @param options Configuration of DataverseClient.
      */
     public constructor(
-        private client: WebClient,
+        tokenProvider: TokenProvider,
         options?: DataverseClientOptions
     ) {
         this.options = {
@@ -40,7 +42,12 @@ export class DataverseClient {
             ...options
         };
 
-        this.apiBaseUrl = `/api/data/v${this.options.apiVersion}/`;
+        const apiBaseUrl = `${tokenProvider.url}/api/data/v${this.options.apiVersion}/`;
+
+        this.client = new AxiosClient({
+            baseURL: apiBaseUrl,
+        });
+        this.client.setTokenProvider(tokenProvider);
     }
 
     private readonly defaultHeaders = {
@@ -64,7 +71,7 @@ export class DataverseClient {
         try {
             const result = await this.client.request({
                 method: method,
-                url: `${this.apiBaseUrl}${url}`,
+                url,
                 data: data,
                 headers: { ...this.defaultHeaders, ...headers }
             });

@@ -1,6 +1,6 @@
 import { parseConnectionString } from "@tediousjs/connection-string";
-import { isNullOrEmpty, takeFirstNotNullOrEmpty } from "../../../utils/common";
 import { parse as uriParse }  from "uri-js";
+import { isNullOrEmpty, parseBoolean, takeFirstNotNullOrEmpty } from "../../utils/common";
 
 const ServiceUri = ["ServiceUri", "Service Uri", "Url", "Server"];
 const UserName = [ "UserName", "User Name", "UserId", "User Id" ];
@@ -54,6 +54,9 @@ export enum LoginPromptType {
 const sampleClientId = "51f81489-12ee-4a9e-aaae-a2591f45987d";
 const sampleRedirectUrl = "app://58145B91-0C36-4500-8554-080854F2AC97";
 
+/**
+ * Connection string of a Dataverse / D365 environment.
+ */
 export class ConnectionString {
     /**
      * Url to the Dataverse / D365 environment.
@@ -87,17 +90,20 @@ export class ConnectionString {
 
     /**
      * Client id for OAuth authentication.
+     * @default 51f81489-12ee-4a9e-aaae-a2591f45987d
      */
     public clientId?: string;
 
     /**
      * Redirect url for OAuth authentication.
+     * @default app://58145B91-0C36-4500-8554-080854F2AC97
      */
     public redirectUri?: string;
 
     /**
      * Path to the token cache file.
      * Used for OAuth authentication only.
+     * Must be set to persist the token.
      */
     public tokenCacheStorePath?: string;
 
@@ -145,23 +151,15 @@ export class ConnectionString {
         this.certStoreName = takeFirstNotNullOrEmpty(parsed, CertStoreName);
         this.certThumbprint = takeFirstNotNullOrEmpty(parsed, CertThumbprint);
         this.homeRealmUri = takeFirstNotNullOrEmpty(parsed, HomeRealmUri);
-        this.requireNewInstance = this.parseBoolean(takeFirstNotNullOrEmpty(parsed, RequireNewInstance));
+        this.requireNewInstance = parseBoolean(takeFirstNotNullOrEmpty(parsed, RequireNewInstance));
         this.loginPrompt = this.parseLoginPrompt(takeFirstNotNullOrEmpty(parsed, LoginPrompt));
-        this.skipDiscovery = this.parseBoolean(takeFirstNotNullOrEmpty(parsed, SkipDiscovery));
+        this.skipDiscovery = parseBoolean(takeFirstNotNullOrEmpty(parsed, SkipDiscovery));
         this.integratedSecurity = takeFirstNotNullOrEmpty(parsed, IntegratedSecurity);
 
         if (this.authType == AuthenticationType.OAuth && isNullOrEmpty(this.clientId) && isNullOrEmpty(this.redirectUri)) {
             this.clientId = sampleClientId;
             this.redirectUri = sampleRedirectUrl;
         }
-    }
-
-    private parseBoolean(value?: string): boolean | undefined {
-        if (value == null) {
-            return undefined;
-        }
-
-        return value.toLowerCase() === "true";
     }
 
     private parseLoginPrompt(loginPrompt?: string): LoginPromptType | undefined {

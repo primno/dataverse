@@ -1,25 +1,29 @@
-import { NtlmClient } from "../ntlm";
 import { discoverAuthority } from "../oauth/authority";
-import { OAuthClient, OAuthConfig } from "../oauth";
+import { OAuthTokenProvider, OAuthConfig } from "../oauth";
 import { DeviceCodeResponse } from "@azure/msal-common";
 import { convertToOAuth2Credential } from "./converter/oauth-converter";
-import { RequestOptions, Response, WebClient } from "../../web-client";
 import { AuthenticationType, ConnectionString } from "./connection-string";
-import { convertToNetworkCredential } from "./converter/ntlm-converter";
+import { TokenProvider } from "../token-provider";
 
 /**
  * Persistence options.
  * Persistence is enabled when `AuthType` is `OAuth` and `TokenCacheStorePath` is set in connection string.
  */
 interface PersistenceOptions {
+    /**
+     * Service name. Used by Linux and macOS keychain.
+     */
     serviceName: string;
+    /**
+     * Account name. Used by Linux and macOS keychain.
+     */
     accountName: string;
 }
 
 /**
  * Options for OAuth2 authentication
  */
-interface OAuth2Options {
+interface OAuthOptions {
     /**
      * Persistence options
      */
@@ -37,19 +41,19 @@ interface OAuth2Options {
  * Options for connection string authentication.
  */
 export interface ConnectionStringOptions {
-    oAuth: OAuth2Options;
+    oAuth: OAuthOptions;
 }
 
 /**
  * Provides web client for connection string authentication.
  */
-export class ConnectionStringClient implements WebClient {
+export class ConnStringTokenProvider implements TokenProvider {
     private csp: ConnectionString;
-    private webClient: WebClient | undefined;
+    private tokenProvider: TokenProvider | undefined;
 
     /**
      * Creates a new instance of ConnStringClientProvider.
-     * Supported authentication types: AD, OAuth.
+     * Supported authentication types: OAuth.
      * @param connectionString Connection string as string or ConnectionString object.
      * @param options Options for connection string authentication.
      */
@@ -75,18 +79,13 @@ export class ConnectionStringClient implements WebClient {
         }
     }
 
-    private async getWebClient(): Promise<WebClient> {
-        if (this.webClient == null) {
+    public get url(): string {
+        return this.csp.serviceUri!;
+    }
+
+    private async getTokenProvider(): Promise<TokenProvider> {
+        if (this.tokenProvider == null) {
             switch (this.csp.authType) {
-                case AuthenticationType.AD:
-                    {
-                        const credentials = convertToNetworkCredential(this.csp);
-                        this.webClient = new NtlmClient({
-                            credentials,
-                            url: this.csp.serviceUri as string
-                        });
-                        break;
-                    }
                 case AuthenticationType.OAuth:
                     {
                         const authority = await discoverAuthority(this.csp.serviceUri as string);
@@ -100,19 +99,21 @@ export class ConnectionStringClient implements WebClient {
                                 ...this.options.oAuth.persistence
                             },
                             deviceCodeCallback: this.options.oAuth.deviceCodeCallback,
-                            url: this.csp.serviceUri as string
+                            url: this.csp.serviceUri!
                         };
-                        this.webClient = new OAuthClient(options);
+
+                        this.tokenProvider = new OAuthTokenProvider(options);
                         break;
                     }
                 default: throw new Error("Unsupported authentication type");
             }
         }
-        return this.webClient;
+
+        return this.tokenProvider;
     }
 
-    public async request(config: RequestOptions): Promise<Response> {
-        const webClient = await this.getWebClient();
-        return webClient.request(config);
+    public async getToken(): Promise<string> {
+        const tokenProvider = await this.getTokenProvider();
+        return await tokenProvider.getToken();
     }
 }

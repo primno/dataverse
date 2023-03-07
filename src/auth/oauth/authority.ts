@@ -1,21 +1,38 @@
-import axios from "axios";
-import { isNullOrEmpty } from "../../../utils/common";
+import { WebClient } from "../../client";
+import { AxiosClient } from "../../client/axios-client";
+import { isNullOrEmpty } from "../../utils/common";
 
 export interface Authority {
     authUrl: string; 
     resource?: string;
 }
 
-export async function discoverAuthority(url: string): Promise<Authority> {
+/**
+ * Discover authority from a given Dataverse/D365 url.
+ * @param url Url to discover authority from.
+ * @param client Web client to use for discovery. If not specified, a new axios client will be created.
+ */
+export async function discoverAuthority(url: string, client?: WebClient): Promise<Authority> {
     const wwwAuthenticate = "www-authenticate";
     const bearer = "Bearer";
 
-    const client = axios.create({ baseURL: url });
+    if (client == null) {
+        client = new AxiosClient({
+            baseURL: url,
+            validateStatus: () => true,
+            maxRedirects: 0
+        });
+    }
+
     // SDKClientVersion ensures that the WWW-Authenticate header contains authorization_uri
-    const response = await client.get("api/discovery/?SDKClientVersion=9.1", {
-        validateStatus: () => true,
-        maxRedirects: 0
+    const response = await client.request({
+        method: "GET",
+        url: "api/discovery/?SDKClientVersion=9.1"
     });
+    
+    if (response.headers == null) {
+        throw new Error("Unable to discover authority");
+    }
 
     const authenticateHeader = response.headers[wwwAuthenticate]?.trim() as string | undefined;
 
