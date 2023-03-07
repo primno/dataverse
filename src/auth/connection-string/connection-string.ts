@@ -1,5 +1,4 @@
 import { parseConnectionString } from "@tediousjs/connection-string";
-import { parse as uriParse }  from "uri-js";
 import { isNullOrEmpty, parseBoolean, takeFirstNotNullOrEmpty } from "../../utils/common";
 
 const ServiceUri = ["ServiceUri", "Service Uri", "Url", "Server"];
@@ -117,24 +116,6 @@ export class ConnectionString {
      * Client secret for OAuth authentication.
      */
     public clientSecret?: string;
-
-    /**
-     * Indicates if the connection string is for online environment.
-     */
-    public get isOnline(): boolean | undefined {
-        if (isNullOrEmpty(this.serviceUri)) {
-            return undefined;
-        }
-
-        const parsedUri = uriParse(this.serviceUri);
-        const host = parsedUri.host?.toUpperCase();
-
-        const onlineDomains = ["DYNAMICS.COM", "MICROSOFTDYNAMICS.DE",
-                               "MICROSOFTDYNAMICS.US", "APPSPLATFORM.US",
-                               "CRM.DYNAMICS.CN", "DYNAMICS-INT.COM"];
-
-        return onlineDomains.some(d => host?.endsWith(d));
-    }
 
     public constructor(connectionString: string) {
         const parsed = parseConnectionString(connectionString) as Record<string, string>;
