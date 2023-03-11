@@ -22,7 +22,6 @@ export async function createApplication(oAuthOptions: OAuthConfig): Promise<Appl
         auth: {
             clientId: credentials.clientId,
             authority: credentials.authorityUrl,
-            clientSecret: credentials.clientSecret,
             knownAuthorities: [credentials.authorityUrl]
         },
         system: {
@@ -38,10 +37,17 @@ export async function createApplication(oAuthOptions: OAuthConfig): Promise<Appl
         cache: persistence.enabled ? await getCacheOptions(persistence) : undefined
     };
 
-    if (credentials.clientSecret) {
+    if (credentials.clientSecret || credentials.clientCertificate) {
         return {
             type: "confidential",
-            client: new ConfidentialClientApplication(options)
+            client: new ConfidentialClientApplication({
+                ...options,
+                auth: {
+                    ...options.auth,
+                    clientSecret: credentials.clientSecret,
+                    clientCertificate: credentials.clientCertificate
+                }
+            })
         };
     }
     else {

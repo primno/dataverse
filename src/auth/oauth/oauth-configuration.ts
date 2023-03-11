@@ -1,11 +1,44 @@
 export interface OAuthCredentials {
+    /**
+     * OAuth flow
+     */
     grantType: "client_credential" | "password" | "device_code";
+    /**
+     * Client ID
+     */
     clientId: string;
+    /**
+     * Client secret for ConfidentialClientApplication.
+     * If set, clientCertificate is not required.
+     */
     clientSecret?: string;
+    /**
+     * Client certificate for ConfidentialClientApplication.
+     * If set, clientSecret is not required.
+     */
+    clientCertificate?: {
+        thumbprint: string;
+        privateKey: string;
+    },
+    /**
+     * Authority URL (eg: https://login.microsoftonline.com/common/)
+     */
     authorityUrl: string;
+    /**
+     * Username for password and device_code flow.
+     */
     userName?: string;
+    /**
+     * Password for password flow.
+     */
     password?: string;
+    /**
+     * Redirect URI.
+     */
     redirectUri?: string;
+    /**
+     * Scope. Dataverse url suffixed with .default.
+     */
     scope?: string;
 }
 
