@@ -37,7 +37,8 @@
     "node_modules"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16",
+    "npm": ">=7"
   },
   "publishConfig": {
     "access": "public",
