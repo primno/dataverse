@@ -46,7 +46,7 @@ export class FilePersistenceWithDataProtection extends BasePersistence implement
             const encryptedContents = Dpapi.protectData(
                 Buffer.from(contents, "utf-8"),
                 this.optionalEntropy,
-                this.scope.toString());
+                this.scope);
             await this.filePersistence.saveBuffer(encryptedContents);
         } catch (err: any) {
             throw PersistenceError.createFilePersistenceWithDPAPIError(err.message);
@@ -63,7 +63,7 @@ export class FilePersistenceWithDataProtection extends BasePersistence implement
             return Dpapi.unprotectData(
                 encryptedContents,
                 this.optionalEntropy,
-                this.scope.toString()).toString();
+                this.scope).toString();
         } catch (err: any) {
             throw PersistenceError.createFilePersistenceWithDPAPIError(err.message);
         }

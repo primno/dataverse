@@ -1,7 +1,7 @@
 {
   "name": "@primno/dataverse-client",
-  "version": "0.8.1-beta.0",
-  "description": "Dataverse / Dynamics 365 CE (on-premises) client for Node.JS",
+  "version": "0.8.1-beta.1",
+  "description": "Dataverse / Dynamics 365 CE (on-premises) client for Node.JS. Provides authentication with connection string or OAuth 2.0.",
   "repository": "github:primno/dataverse-client",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -10,14 +10,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c --environment NODE_ENV:production",
-    "watch": "rollup -c -w"
+    "build": "rollup -c --configPlugin typescript --environment NODE_ENV:production",
+    "watch": "rollup -c -w --configPlugin typescript"
   },
   "author": "Xavier Monin",
   "license": "MIT",
   "dependencies": {
-    "@azure/msal-node": "^1.15.0",
-    "@primno/dpapi": "^1.0.0",
+    "@azure/msal-node": "^1.16.0",
+    "@primno/dpapi": "^1.1.0",
     "@tediousjs/connection-string": "^0.4.2",
     "axios": "^1.3.4",
     "keytar": "^7.9.0"
@@ -28,7 +28,7 @@
     "@rollup/plugin-terser": "^0.4.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.14.0",
-    "rollup": "^3.17.1",
+    "rollup": "^3.19.1",
     "tslib": "^2.5.0"
   },
   "eslintIgnore": [
@@ -36,15 +36,22 @@
     "dist",
     "node_modules"
   ],
+  "engines": {
+    "node": ">=16",
+    "npm": ">=7"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "keywords": [
-    "dataverse",
-    "dynamics",
-    "d365",
-    "client",
-    "webapi"
+    "Dataverse",
+    "Dynamics",
+    "D365",
+    "Client",
+    "Authentication",
+    "WebApi",
+    "OAuth",
+    "MSAL"
   ]
 }
