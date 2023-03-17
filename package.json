@@ -1,7 +1,7 @@
 {
   "name": "@primno/dataverse-client",
   "version": "0.8.1-beta.0",
-  "description": "Dataverse / Dynamics 365 CE (on-premises) client for Node.JS",
+  "description": "Dataverse / Dynamics 365 CE (on-premises) client for Node.JS. Provides authentication with connection string or OAuth 2.0.",
   "repository": "github:primno/dataverse-client",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -10,8 +10,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c --environment NODE_ENV:production",
-    "watch": "rollup -c -w"
+    "build": "rollup -c --configPlugin typescript --environment NODE_ENV:production",
+    "watch": "rollup -c -w --configPlugin typescript"
   },
   "author": "Xavier Monin",
   "license": "MIT",
@@ -44,10 +44,13 @@
     "registry": "https://registry.npmjs.org/"
   },
   "keywords": [
-    "dataverse",
-    "dynamics",
-    "d365",
-    "client",
-    "webapi"
+    "Dataverse",
+    "Dynamics",
+    "D365",
+    "Client",
+    "Authentication",
+    "WebApi",
+    "OAuth",
+    "MSAL"
   ]
 }
