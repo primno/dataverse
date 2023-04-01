@@ -92,10 +92,16 @@ export class DeviceCodeTokenProvider extends MsalTokenProvider {
         const { scope } = this.oAuthOptions.credentials;
         const { deviceCodeCallback } = this.oAuthOptions;
 
-        return await client.acquireTokenByDeviceCode({
+        const result = await client.acquireTokenByDeviceCode({
             scopes: [scope as string],
             deviceCodeCallback: deviceCodeCallback!
         });
+
+        if (result != null && result.account?.username !== this.oAuthOptions.credentials.userName) {
+            throw new Error("Device code was not issued for the correct user. Please check your username.");
+        }
+
+        return result;
     }
 }
 
