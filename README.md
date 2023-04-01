@@ -13,8 +13,7 @@ dataverse-client provides :
     - Your custom token provider.
 - [Query builder](#queries) to build OData queries.
 
-> **Important**
-> dataverse-client is in beta stage and subject to change.
+> This package is part of the [Primno](https://primno.io) framework.
 
 ## Compatibility
 
