@@ -34,7 +34,7 @@ abstract class MsalTokenProvider implements TokenProvider {
             const tokenCache = this.application.client.getTokenCache();
             const accounts = await tokenCache.getAllAccounts();
 
-            return accounts.find(a => a.username.toLocaleLowerCase() === username?.toLocaleLowerCase());   
+            return accounts.find(a => a.username.toLocaleLowerCase() === username?.toLocaleLowerCase());
         }
     }
 
@@ -87,7 +87,7 @@ export class DeviceCodeTokenProvider extends MsalTokenProvider {
 
         super(oAuthOptions, ["public"]);
     }
-    
+
     async acquireToken(client: IPublicClientApplication): Promise<AuthenticationResult | null> {
         const { scope } = this.oAuthOptions.credentials;
         const { deviceCodeCallback } = this.oAuthOptions;
@@ -97,7 +97,8 @@ export class DeviceCodeTokenProvider extends MsalTokenProvider {
             deviceCodeCallback: deviceCodeCallback!
         });
 
-        if (result != null && result.account?.username !== this.oAuthOptions.credentials.userName) {
+        if (result != null &&
+            result.account?.username?.toLowerCase() !== this.oAuthOptions.credentials.userName?.toLowerCase()) {
             throw new Error("Device code was not issued for the correct user. Please check your username.");
         }
 
@@ -111,9 +112,9 @@ export class UserPasswordTokenProvider extends MsalTokenProvider {
             throw new Error("Username and password are required for password flow");
         }
 
-        super(oAuthOptions,  ["confidential", "public"]);
+        super(oAuthOptions, ["confidential", "public"]);
     }
-    
+
     async acquireToken(client: IPublicClientApplication | IConfidentialClientApplication): Promise<AuthenticationResult | null> {
         const { scope, userName: username, password } = this.oAuthOptions.credentials;
 
@@ -133,7 +134,7 @@ export class ClientCredentialTokenProvider extends MsalTokenProvider {
 
         super(oAuthOptions, ["confidential"]);
     }
-    
+
     async acquireToken(client: IConfidentialClientApplication): Promise<AuthenticationResult | null> {
         const { scope } = this.oAuthOptions.credentials;
 
