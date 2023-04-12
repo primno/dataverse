@@ -64,13 +64,15 @@ export interface PersistenceOptionsOn {
 
     /**
      * Service name. Only used on Linux/MacOS to store the token in the keychain.
+     * @default "Primno.DataverseClient"
      */
-    serviceName: string;
+    serviceName?: string;
 
     /**
      * Account name. Only used on Linux/MacOS to store the token in the keychain.
+     * @default "MSALCache"
      */
-    accountName: string;
+    accountName?: string;
 }
 
 interface PersistenceOptionsOff {

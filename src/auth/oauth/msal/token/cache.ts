@@ -4,9 +4,13 @@ import { DataProtectionScope, IPersistenceConfiguration, PersistenceCachePlugin,
 
 export async function getCacheOptions(persistenceOptions: PersistenceOptionsOn): Promise<CacheOptions> {
     const persistenceConfiguration: IPersistenceConfiguration = {
-        ...persistenceOptions,
+        // Default values
+        serviceName: "Primno.DataverseClient",
+        accountName: "MSALCache",
         dataProtectionScope: DataProtectionScope.CurrentUser,
-        usePlaintextFileOnLinux: false
+        usePlaintextFileOnLinux: false,
+        // Override with user values
+        ...persistenceOptions
     };
 
     const persistencePlugin = await PersistenceCreator.createPersistence(persistenceConfiguration);

@@ -12,12 +12,14 @@ import { TokenProvider } from "../token-provider";
 interface PersistenceOptions {
     /**
      * Service name. Used by Linux and macOS keychain.
+     * @default "Primno.DataverseClient"
      */
-    serviceName: string;
+    serviceName?: string;
     /**
      * Account name. Used by Linux and macOS keychain.
+     * @default "MSALCache"
      */
-    accountName: string;
+    accountName?: string;
 }
 
 /**
@@ -25,14 +27,14 @@ interface PersistenceOptions {
  */
 interface OAuthOptions {
     /**
-     * Persistence options
+     * Persistence options.
+     * Persistence is enabled when `AuthType` is `OAuth` and `TokenCacheStorePath` is set in connection string.
      */
-    persistence: PersistenceOptions;
+    persistence?: PersistenceOptions;
 
     /**
      * Device code callback. Only used when grant_type is device_code.
      * @param response The device code response
-     * @returns 
      */
     deviceCodeCallback?: (response: DeviceCodeResponse) => void;
 }

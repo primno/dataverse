@@ -42,8 +42,8 @@ const tokenProvider = new ConnStringTokenProvider(
             // For persistent token cache on Linux/Mac to store the token in the keychain.
             // Only used when TokenCacheStorePath is set.
             persistence: {
-                serviceName: "<serviceName>",
-                accountName: "<accountName>"
+                serviceName: "<serviceName>", // Optional, default to "Primno.DataverseClient"
+                accountName: "<accountName>" // Optional, default to "MSALCache"
             },
             // For device code flow
             deviceCodeCallback: (deviceCode) => {
@@ -66,8 +66,8 @@ import { DataverseClient, OAuthTokenProvider } from '@primno/dataverse-client';
 const tokenProvider = new OAuthTokenProvider({
     url: "https://<Environment>.crm.dynamics.com",
     credentials: {
-        clientId: "51f81489-12ee-4a9e-aaae-a2591f45987d", // Sandbox
-        redirectUri: "app://58145B91-0C36-4500-8554-080854F2AC97", // Sandbox
+        clientId: "51f81489-12ee-4a9e-aaae-a2591f45987d", // Sandbox client id
+        redirectUri: "app://58145B91-0C36-4500-8554-080854F2AC97", // Sandbox redirect uri
         authorityUrl: "https://login.microsoftonline.com/common",
         scope: "https://<Environment>.crm.dynamics.com/.default",
         grantType: "device_code",
@@ -111,8 +111,8 @@ const tokenProvider = new ConnStringTokenProvider(
             // For persistent token cache on Linux/Mac to store the token in the keychain.
             // Only used when TokenCacheStorePath is set.
             persistence: {
-                serviceName: "<serviceName>",
-                accountName: "<accountName>"
+                serviceName: "<serviceName>", // Optional, default to "Primno.DataverseClient"
+                accountName: "<accountName>" // Optional, default to "MSALCache"
             },
             // For device code flow. Show the url and code to the user.
             deviceCodeCallback: (deviceCode) => {
@@ -216,12 +216,12 @@ interface OAuthConfig {
         cachePath: string;
 
         /**
-         * Service name. Only used on Linux/MacOS to store the token in the keychain.
+         * Service name. Only used on Linux/MacOS to store the token in the keychain. Default: "Primno.DataverseClient"
          */
         serviceName: string;
 
         /**
-         * Account name. Only used on Linux/MacOS to store the token in the keychain.
+         * Account name. Only used on Linux/MacOS to store the token in the keychain. Default: "MSALCache"
          */
         accountName: string;
     };
