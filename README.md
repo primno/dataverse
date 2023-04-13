@@ -66,8 +66,8 @@ import { DataverseClient, OAuthTokenProvider } from '@primno/dataverse-client';
 const tokenProvider = new OAuthTokenProvider({
     url: "https://<Environment>.crm.dynamics.com",
     credentials: {
-        clientId: "51f81489-12ee-4a9e-aaae-a2591f45987d", // Sandbox client id
-        redirectUri: "app://58145B91-0C36-4500-8554-080854F2AC97", // Sandbox redirect uri
+        clientId: "51f81489-12ee-4a9e-aaae-a2591f45987d", // Sample client id
+        redirectUri: "app://58145B91-0C36-4500-8554-080854F2AC97", // Sample redirect uri
         authorityUrl: "https://login.microsoftonline.com/common",
         scope: "https://<Environment>.crm.dynamics.com/.default",
         grantType: "device_code",

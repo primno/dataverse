@@ -7,18 +7,18 @@ import { TokenProvider } from "./auth/token-provider";
 /**
  * Collection of entities.
  */
-export interface EntityCollection<TModele extends Modele = Modele> {
+export interface EntityCollection<TModel extends Model = Model> {
     /**
      * Entities.
      */
-    entities: TModele[];
+    entities: TModel[];
     /**
-     * Nextlink to retrieve next page. To retrieve the next page, nextLink must be passed to the options parameter of retrieveMultipleRecords().
+     * Link to the next page. To retrieve the next page, nextLink must be passed to the options parameter of `retrieveMultipleRecords()`.
      */
     nextLink?: string;
 }
 
-type Modele = Record<string, any>;
+type Model = Record<string, any>;
 
 /**
  * Dataverse client.
@@ -89,11 +89,11 @@ export class DataverseClient {
      * @param options Selected fields.
      * @returns The record
      */
-    public async retrieveRecord<TModele extends Modele = Modele>(
+    public async retrieveRecord<TModel extends Model = Model>(
         entitySetName: string,
         id: string,
         options?: RetrieveOptions
-    ): Promise<TModele> {
+    ): Promise<TModel> {
         const result = await this.request({
             method: "get",
             url: `${entitySetName}(${id})${convertRetrieveOptionsToString(options)}`
@@ -117,11 +117,11 @@ export class DataverseClient {
      * });
      * @returns Collection of records.
      */
-    public async retrieveMultipleRecords<TModele extends Modele = Modele>(
+    public async retrieveMultipleRecords<TModel extends Model = Model>(
         entitySetName: string,
         options?: RetrieveMultipleOptions,
         maxPageSize?: number
-    ): Promise<EntityCollection<TModele>> {
+    ): Promise<EntityCollection<TModel>> {
         const result = await this.request({
             method: "get",
             url: `${entitySetName}${convertRetrieveMultipleOptionsToString(options)}`,
@@ -140,10 +140,10 @@ export class DataverseClient {
      * @param data Record to create.
      * @returns Created record.
      */
-    public async createRecord<TModele extends Modele = Modele>(
+    public async createRecord<TModel extends Model = Model>(
         entitySetName: string,
-        data: TModele
-    ): Promise<TModele> {
+        data: TModel
+    ): Promise<TModel> {
         const result = await this.request({
             method: "post",
             url: entitySetName,
@@ -161,7 +161,7 @@ export class DataverseClient {
      * @param data Record with updated data.
      * @returns Updated record.
      */
-    public async updateRecord<TModele extends Modele = Modele>(entitySetName: string, id: string, data?: TModele): Promise<TModele> {
+    public async updateRecord<TModel extends Model = Model>(entitySetName: string, id: string, data?: TModel): Promise<TModel> {
         const result = await this.request({
             method: "patch",
             url: `${entitySetName}(${id})`,
