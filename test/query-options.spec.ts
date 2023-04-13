@@ -90,6 +90,25 @@ describe("QueryOptions", () => {
         });
     });
 
+    describe("$orderby", () => {
+        it("should generate a $orderby query option", () => {
+            const options: MultipleQueryOptions = {
+                orders: [
+                    {
+                        attribute: "foo",
+                        order: "desc"
+                    },
+                    {
+                        attribute: "bar",
+                        order: "asc"
+                    }
+                ],
+                select: ["selectedField"]
+            };
+            expect(convertQueryOptionsToString(options)).toBe("?$select=selectedField&$orderby=foo desc,bar asc");
+        });
+    });
+
     describe("multiple query options", () => {
         it("should generate multiple query options", () => {
             const options: MultipleQueryOptions = {
