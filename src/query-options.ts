@@ -82,6 +82,7 @@ export function convertQueryOptionsToString(options: MultipleQueryOptions): stri
         $select = generateSelect(select),
         $filter = generateFilter(filters),
         $expand = generateExpand(expands),
+        $order = generateOrder(options.orders),
         $top = top ? `$top=${top}` : null,
         optionParts = [];
 
@@ -96,6 +97,9 @@ export function convertQueryOptionsToString(options: MultipleQueryOptions): stri
     }
     if ($expand) {
         optionParts.push($expand)
+    }
+    if ($order) {
+        optionParts.push($order);
     }
     
     return optionParts.length > 0 ? `?${optionParts.join("&")}` : EmptyString;
@@ -113,6 +117,11 @@ function generateSelect(attributes: string[] = []): string {
 function generateFilter(filters: Filter[] = []): string {
     const filterAttributes = filters.map(f => parseFilter(f));
     return filterAttributes.length > 0 ? `$filter=${filterAttributes.join(" and ")}` : EmptyString;
+}
+
+function generateOrder(orders: OrderBy[] = []): string {
+    const orderAttributes = orders.map(o => `${o.attribute} ${o.order ?? "asc"}`);
+    return orderAttributes.length > 0 ? `$orderby=${orderAttributes.join(",")}` : EmptyString;
 }
 
 function parseQueryFunction(condition: Condition): string {
