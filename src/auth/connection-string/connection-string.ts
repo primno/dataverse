@@ -117,7 +117,7 @@ export class ConnectionString {
      */
     public clientSecret?: string;
 
-    public constructor(connectionString: string) {
+    public constructor(private connectionString: string) {
         const parsed = parseConnectionString(connectionString) as Record<string, string>;
 
         this.authType = this.parseAuthenticationType(takeFirstNotNullOrEmpty(parsed, AuthType));
@@ -159,5 +159,9 @@ export class ConnectionString {
             case "office365": return AuthenticationType.Office365;
             case "ad": return AuthenticationType.AD;
         }
+    }
+
+    public toString(): string {
+        return this.connectionString;
     }
 }

@@ -7,11 +7,13 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "test"
   ],
   "scripts": {
     "build": "rollup -c --configPlugin typescript --environment NODE_ENV:production",
-    "watch": "rollup -c -w --configPlugin typescript"
+    "watch": "rollup -c -w --configPlugin typescript",
+    "test": "jest"
   },
   "author": "Xavier Monin",
   "license": "MIT",
@@ -29,7 +31,10 @@
     "@rollup/plugin-typescript": "^11.1.0",
     "@types/node": "^18.14.0",
     "rollup": "^3.20.2",
-    "tslib": "^2.5.0"
+    "tslib": "^2.5.0",
+    "jest": "^29.5.0",
+    "@types/jest": "^29.5.0",
+    "ts-jest": "^29.0.5"
   },
   "eslintIgnore": [
     "build",

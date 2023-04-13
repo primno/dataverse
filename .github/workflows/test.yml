@@ -1,4 +1,4 @@
-name: Build
+name: Test
 
 on:
   push:
@@ -25,7 +25,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           
-      - name: Install and build
+      - name: Install, build and test
         run: |
           npm ci
           npm run build
+          npm run test

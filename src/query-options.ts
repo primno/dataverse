@@ -97,6 +97,7 @@ export function convertQueryOptionsToString(options: MultipleQueryOptions): stri
     if ($expand) {
         optionParts.push($expand)
     }
+    
     return optionParts.length > 0 ? `?${optionParts.join("&")}` : EmptyString;
 }
 

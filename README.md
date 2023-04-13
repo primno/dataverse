@@ -2,7 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/@primno/dataverse-client.svg)](https://www.npmjs.com/package/@primno/dataverse-client)
 [![npm](https://img.shields.io/npm/l/@primno/dataverse-client.svg)](https://github.com/primno/dataverse-client/blob/main/LICENSE)
-![build](https://img.shields.io/github/actions/workflow/status/primno/dataverse-client/build.yml)
+![build](https://img.shields.io/github/actions/workflow/status/primno/dataverse-client/test.yml)
+![node-current](https://img.shields.io/node/v/@primno/dataverse-client)
 
 dataverse-client is library for Node.JS to make WebAPI requests to Dataverse and Dynamics 365 CE (on-premises).
 
