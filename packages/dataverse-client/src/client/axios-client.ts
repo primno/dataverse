@@ -1,6 +1,6 @@
+import { TokenProvider } from "../token-provider";
 import { RequestOptions as WebClientRequestOptions, Response as WebClientResponse, WebClient } from "./web-client";
 import axios, { AxiosInstance, CreateAxiosDefaults } from "axios";
-import { TokenProvider } from "../auth/token-provider";
 
 export interface ErrorResponse {
     errorCode: number;

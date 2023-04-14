@@ -1,5 +1,5 @@
 import { parseConnectionString } from "@tediousjs/connection-string";
-import { isNullOrEmpty, parseBoolean, takeFirstNotNullOrEmpty } from "../../utils/common";
+import { isNullOrEmpty, parseBoolean, takeFirstNotNullOrEmpty } from "../utils/common";
 
 const ServiceUri = ["ServiceUri", "Service Uri", "Url", "Server"];
 const UserName = [ "UserName", "User Name", "UserId", "User Id" ];

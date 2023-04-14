@@ -1,4 +1,4 @@
-import { AuthenticationType, ConnectionString, LoginPromptType } from "../src/auth/connection-string";
+import { AuthenticationType, ConnectionString, LoginPromptType } from "../src/connection-string";
 
 describe("Connection-string", () => {
     describe("Enum values", () => {

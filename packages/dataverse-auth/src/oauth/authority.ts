@@ -1,6 +1,5 @@
-import { WebClient } from "../../client";
-import { AxiosClient } from "../../client/axios-client";
-import { isNullOrEmpty } from "../../utils/common";
+import { isNullOrEmpty } from "../utils/common";
+import { AxiosClient, WebClient } from "@primno/dataverse-client";
 
 export interface Authority {
     /**

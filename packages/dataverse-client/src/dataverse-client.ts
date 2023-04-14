@@ -2,7 +2,7 @@ import { DataverseClientOptions } from "./dataverse-client-options";
 import { convertRetrieveMultipleOptionsToString, convertRetrieveOptionsToString, RetrieveMultipleOptions, RetrieveOptions } from "./query-options";
 import { RequestOptions, Response, WebClient } from "./client";
 import { AxiosClient } from "./client/axios-client";
-import { TokenProvider } from "./auth/token-provider";
+import { TokenProvider } from "./token-provider";
 
 /**
  * Collection of entities.

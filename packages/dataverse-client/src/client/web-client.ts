@@ -1,4 +1,4 @@
-import { TokenProvider } from "../auth/token-provider";
+import { TokenProvider } from "../token-provider";
 
 export type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS" | "TRACE" | string;
 

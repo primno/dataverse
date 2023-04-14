@@ -6,7 +6,7 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,
-    "outDir": "build",
+    "declarationDir": ".",
     "declaration": true,
     "emitDeclarationOnly": true,
     "sourceMap": true,
@@ -14,8 +14,5 @@
     // "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src",
-    "rollup.config.ts"
-  ]
+  "exclude": ["node_modules", "build", "dist"]
 }
