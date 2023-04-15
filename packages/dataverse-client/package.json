@@ -11,7 +11,7 @@
     "test"
   ],
   "scripts": {
-    "build": "rollup -c --configPlugin typescript --environment NODE_ENV:production",
+    "build": "rollup -c --configPlugin typescript --environment NODE_ENV:production --failAfterWarnings",
     "watch": "rollup -c -w --configPlugin typescript",
     "test": "jest"
   },

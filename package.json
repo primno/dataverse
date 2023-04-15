@@ -11,7 +11,8 @@
   "author": "Xavier Monin",
   "license": "MIT",
   "workspaces": [
-    "packages/*"
+    "packages/dataverse-client",
+    "packages/dataverse-auth"
   ],
   "devDependencies": {
     "@types/node": "^18.14.0",
