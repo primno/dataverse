@@ -14,7 +14,7 @@ export interface Authority {
 }
 
 /**
- * Discover authority from a given Dataverse/D365 url.
+ * Discover authority from a Dataverse/D365 url.
  * @param url Url to discover authority from.
  * @param client Web client to use for discovery. If not specified, a new axios client will be created.
  */

@@ -1,3 +1,6 @@
+/**
+ * OAuth2 credentials.
+ */
 export interface OAuthCredentials {
     /**
      * OAuth flow
@@ -84,6 +87,9 @@ interface PersistenceOptionsOff {
 
 export type PersistenceOptions = PersistenceOptionsOn | PersistenceOptionsOff;
 
+/**
+ * Options for OAuth2 authentication
+ */
 export interface OAuthConfig {
     /**
      * OAuth2 credentials

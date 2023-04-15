@@ -47,7 +47,7 @@ export interface ConnectionStringOptions {
 }
 
 /**
- * Provides web client for connection string authentication.
+ * Provides a token from a connection string.
  */
 export class ConnStringTokenProvider implements TokenProvider {
     private csp: ConnectionString;

@@ -1,18 +1,15 @@
 # Dataverse Client for Node.JS
 
 [![npm](https://img.shields.io/npm/v/@primno/dataverse-client.svg)](https://www.npmjs.com/package/@primno/dataverse-client)
-[![npm](https://img.shields.io/npm/l/@primno/dataverse-client.svg)](https://github.com/primno/dataverse-client/blob/main/LICENSE)
-![build](https://img.shields.io/github/actions/workflow/status/primno/dataverse-client/test.yml)
+[![npm](https://img.shields.io/npm/l/@primno/dataverse-client.svg)](https://github.com/primno/dataverse/blob/main/LICENSE)
+![build](https://img.shields.io/github/actions/workflow/status/primno/dataverse/test.yml)
 ![node-current](https://img.shields.io/node/v/@primno/dataverse-client)
 
 dataverse-client is library for Node.JS to make WebAPI requests to Dataverse and Dynamics 365 CE (on-premises).
 
-dataverse-client provides :
-- [Authentication](#authentication) to Dataverse:
-    - Connection string
-    - OAuth
-    - Your custom token provider.
-- [Query builder](#queries) to build OData queries.
+dataverse-client provides a [Query builder](#queries) to build OData queries.
+
+Works with a token provider. Use [`@primno/dataverse-auth`](https://www.npmjs.com/package/@primno/dataverse-auth) to authenticate with Connection String or OAuth2.
 
 > This package is part of the [Primno](https://primno.io) framework.
 
@@ -20,13 +17,11 @@ dataverse-client provides :
 
 dataverse-client works with Dataverse (Dynamics 365 Online) and Dynamics 365 CE (on-premises).
 
-Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ with OAuth enabled in deployment settings).
-
 ## Quick start
 
 ### Installation
 ```bash
-  npm install @primno/dataverse-client
+  npm install @primno/dataverse-client @primno/dataverse-auth
 ```
 
 ### Usage
@@ -34,7 +29,8 @@ Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deploy
 With connection string authentication:
 
 ```ts
-import { DataverseClient, ConnStringTokenProvider } from '@primno/dataverse-client';
+import { DataverseClient } from '@primno/dataverse-client';
+import { ConnStringTokenProvider } from '@primno/dataverse-auth';
 
 const tokenProvider = new ConnStringTokenProvider(
     "AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;TokenCacheStorePath=./.cache/token.json",
@@ -53,6 +49,7 @@ const tokenProvider = new ConnStringTokenProvider(
         }
      }
 );
+
 const client = new DataverseClient(tokenProvider);
 
 const accounts = await client.retrieveMultipleRecords("accounts", { top: 10 });
@@ -62,7 +59,8 @@ console.log(accounts);
 With OAuth:
 
 ```ts
-import { DataverseClient, OAuthTokenProvider } from '@primno/dataverse-client';
+import { DataverseClient } from '@primno/dataverse-client';
+import { OAuthTokenProvider } from '@primno/dataverse-auth';
 
 const tokenProvider = new OAuthTokenProvider({
     url: "https://<Environment>.crm.dynamics.com",
@@ -90,175 +88,10 @@ console.log(accounts);
 
 ## Authentication
 
-dataverse-client is provided with 2 authentication providers :
-- Connection string
-- OAuth
+`@primno/dataverse-client` needs a token provider to authenticate with Dataverse.
+Use [`@primno/dataverse-auth`](https://www.npmjs.com/package/@primno/dataverse-auth) to authenticate with Connection String or OAuth2.
 
-You can also implement your own authentication provider by implementing the `TokenProvider` interface.
-
-### Connection string
-
-`ConnStringTokenProvider` provides a token by using a connection string (see [Dataverse doc](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/xrm-tooling/use-connection-strings-xrm-tooling-connect) and [D365 CE on-premises doc](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect?view=op-9-1)).
-
-Only `OAuth` authentication type is supported.
-
-The token can be persisted using the `TokenCacheStorePath` connection string parameter. To learn more about the token cache, see [Token cache](#token-cache).
-
-```ts
-const tokenProvider = new ConnStringTokenProvider(
-    "AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;TokenCacheStorePath=./.cache/token.json",
-    {
-        oAuth: {
-            // For persistent token cache on Linux/Mac to store the token in the keychain.
-            // Only used when TokenCacheStorePath is set.
-            persistence: {
-                serviceName: "<serviceName>", // Optional, default to "Primno.DataverseClient"
-                accountName: "<accountName>" // Optional, default to "MSALCache"
-            },
-            // For device code flow. Show the url and code to the user.
-            deviceCodeCallback: (deviceCode) => {
-                console.log(deviceCode.message);
-            }
-        }
-     }
-);
-```
-
-#### OAuth flows
-
-`ConnStringTokenProvider` determines which OAuth flow to use based on the parameters in the connection string.
-
-| Parameters | Flow |
-|-----------|------|
-| `UserName` and `Password` | User password |
-| `ClientId` and `ClientSecret` | Client credential |
-| `UserName` only | Device code |
-
-Examples:
-
-| Environment | AuthType | OAuth flow | Connection string |
-|-------------|----------|------------|-------------------|
-| Dataverse   | OAuth    | Device code | `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>` |
-| Dataverse   | OAuth    | User password | `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;Password=<Password>` |
-| Dataverse   | OAuth    | Client credential | `AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;ClientId=<ClientId>;ClientSecret=<ClientSecret>;RedirectUri=<RedirectUri>` |
-| On-premises | OAuth    | User password | `AuthType=OAuth;RedirectUri=<RedirectUri>;Url=https://<D365Url>;UserName=<Domain>\<UserName>;Password=<Password>` |
-
-### OAuth
-
-`OAuthTokenProvider` provides OAuth authentication.
-
-```ts
-const tokenProvider = new OAuthTokenProvider(options);
-```
-
-Options definition:
-
-```ts
-interface OAuthConfig {
-    /**
-     * OAuth2 credentials
-     */
-    credentials: {
-        /**
-         * OAuth flow
-         */
-        grantType: "client_credential" | "password" | "device_code";
-        /**
-         * Client ID
-         */
-        clientId: string;
-        /**
-         * Client secret for ConfidentialClientApplication.
-         * If set, clientCertificate is not required.
-         */
-        clientSecret?: string;
-        /**
-         * Client certificate for ConfidentialClientApplication.
-         * If set, clientSecret is not required.
-         */
-        clientCertificate?: {
-            thumbprint: string;
-            privateKey: string;
-        },
-        /**
-         * Authority URL (eg: https://login.microsoftonline.com/common/)
-         */
-        authorityUrl: string;
-        /**
-         * Username for password and device_code flow.
-         */
-        userName?: string;
-        /**
-         * Password for password flow.
-         */
-        password?: string;
-        /**
-         * Redirect URI.
-         */
-        redirectUri?: string;
-        /**
-         * Scope. Dataverse url suffixed with .default.
-         */
-        scope?: string;
-    };
-
-    /**
-     * Persistence options
-     */
-    persistence: {
-        /**
-         * Enable persistence. Default: false.
-         */
-        enabled: true;
-        
-        /**
-         * Cache path.
-         */
-        cachePath: string;
-
-        /**
-         * Service name. Only used on Linux/MacOS to store the token in the keychain. Default: "Primno.DataverseClient"
-         */
-        serviceName: string;
-
-        /**
-         * Account name. Only used on Linux/MacOS to store the token in the keychain. Default: "MSALCache"
-         */
-        accountName: string;
-    };
-
-    /**
-     * Device code callback. Only used when grant_type is device_code.
-     * @param response The device code response
-     * @returns 
-     */
-    deviceCodeCallback?: (response: DeviceCodeResponse) => void;
-
-    /**
-     * Dataverse / D365 url. Eg: https://org.crm.dynamics.com
-     */
-    url: string;
-}
-```
-
-### Discover authority
-
-To discover the authority url, you can use the `discoverAuthority` method.
-
-```ts
-interface Authority {
-    authUrl: string; 
-    resource?: string;
-}
-
-const authority: Authority = await discoverAuthority("<DataverseOrOnPremisesUrl>");
-```
-
-#### Token cache
-
-The token can be persisted using the `persistence` option.
-
-It is encrypted using `DPAPI` on Windows, `libsecret` on Linux and the `Keychain` on MacOS.
+You can also use your own token provider by implementing the `TokenProvider` interface.
 
 ## Queries
 
@@ -365,5 +198,3 @@ To fix this issue, you can add your enterprise CA certificate to the trusted roo
 ## Credits
 
 Thanks to [HSO](https://github.com/hso-nn/d365-cli) for query options.
-
-Thanks to Microsoft for persistence cache.
