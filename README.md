@@ -1,8 +1,8 @@
-# Dataverse library for Node.JS
+# Dataverse libraries for Node.JS
 
 ![build](https://img.shields.io/github/actions/workflow/status/primno/dataverse/test.yml)
 
-This repository is a monorepo to connect and make WebAPI requests for Dataverse / D365.
+This repository is a monorepo to connect and make WebAPI requests to Dataverse / D365.
 
 ## Packages
 
