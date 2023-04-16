@@ -1,6 +1,6 @@
 {
   "name": "@primno/dataverse-client",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Dataverse / Dynamics 365 CE (on-premises) client for Node.JS. Use @primno/dataverse-auth to authenticate using a connection string or OAuth 2.0.",
   "repository": "github:primno/dataverse",
   "main": "dist/index.cjs.js",
