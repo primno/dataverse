@@ -37,9 +37,6 @@
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1"
   },
-  "peerDependencies": {
-    "@primno/dataverse-client": ">= 0.8.1"
-  },
   "eslintIgnore": [
     "build",
     "dist",

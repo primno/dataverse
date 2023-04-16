@@ -3,7 +3,6 @@ import {
     NetworkRequestOptions,
     NetworkResponse,
 } from "@azure/msal-common";
-import https from "https";
 import axios, { AxiosRequestConfig } from "axios";
 
 /**
@@ -26,8 +25,7 @@ export class AxiosNetworkModule implements INetworkModule {
         const request: AxiosRequestConfig = {
             method: "get",
             url: url,
-            headers: options && options.headers,
-            httpsAgent: new https.Agent()
+            headers: options && options.headers
         };
 
         const response = await axios(request);
@@ -51,8 +49,7 @@ export class AxiosNetworkModule implements INetworkModule {
             method: "post",
             url: url,
             data: (options && options.body) || "",
-            headers: options && options.headers,
-            httpsAgent: new https.Agent()
+            headers: options && options.headers
         };
 
         const response = await axios(request);

@@ -17,5 +17,4 @@ export * from "./dataverse-client-options";
 
 export { DataverseClient, EntityCollection } from "./dataverse-client";
 
-export * from "./client";
 export * from "./token-provider";

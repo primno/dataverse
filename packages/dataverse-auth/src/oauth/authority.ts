@@ -1,5 +1,5 @@
+import axios from "axios";
 import { isNullOrEmpty } from "../utils/common";
-import { AxiosClient, WebClient } from "@primno/dataverse-client";
 
 export interface Authority {
     /**
@@ -18,17 +18,15 @@ export interface Authority {
  * @param url Url to discover authority from.
  * @param client Web client to use for discovery. If not specified, a new axios client will be created.
  */
-export async function discoverAuthority(url: string, client?: WebClient): Promise<Authority> {
+export async function discoverAuthority(url: string): Promise<Authority> {
     const wwwAuthenticate = "www-authenticate";
     const bearer = "Bearer";
 
-    if (client == null) {
-        client = new AxiosClient({
-            baseURL: url,
-            validateStatus: () => true,
-            maxRedirects: 0
-        });
-    }
+    const client = axios.create({
+        baseURL: url,
+        validateStatus: () => true,
+        maxRedirects: 0
+    });
 
     // SDKClientVersion ensures that the WWW-Authenticate header contains authorization_uri
     const response = await client.request({
