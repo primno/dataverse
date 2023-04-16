@@ -97,9 +97,10 @@ export interface OAuthConfig {
     credentials: OAuthCredentials;
 
     /**
-     * Persistence options
+     * Persistence options.
+     * @default { enabled: false }
      */
-    persistence: PersistenceOptions;
+    persistence?: PersistenceOptions;
 
     /**
      * Device code callback. Only used when grant_type is device_code.

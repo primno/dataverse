@@ -34,7 +34,7 @@ export async function createApplication(oAuthOptions: OAuthConfig): Promise<Appl
                 piiLoggingEnabled: false
             }
         },
-        cache: persistence.enabled ? await getCacheOptions(persistence) : undefined
+        cache: persistence?.enabled ? await getCacheOptions(persistence) : undefined
     };
 
     if (credentials.clientSecret || credentials.clientCertificate) {

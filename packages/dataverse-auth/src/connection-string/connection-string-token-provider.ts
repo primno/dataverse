@@ -43,7 +43,7 @@ interface OAuthOptions {
  * Options for connection string authentication.
  */
 export interface ConnectionStringOptions {
-    oAuth: OAuthOptions;
+    oAuth?: OAuthOptions;
 }
 
 /**
@@ -61,7 +61,7 @@ export class ConnStringTokenProvider implements TokenProvider {
      */
     constructor(
         connectionString: string | ConnectionString,
-        private options: ConnectionStringOptions
+        private options?: ConnectionStringOptions
     ) {
         if (typeof connectionString === "string") {
             this.csp = new ConnectionString(connectionString);
@@ -98,9 +98,9 @@ export class ConnStringTokenProvider implements TokenProvider {
                                 // Persistence is enabled only when the cache path is specified
                                 enabled: this.csp.tokenCacheStorePath != null,
                                 cachePath: this.csp.tokenCacheStorePath!,
-                                ...this.options.oAuth.persistence
+                                ...this.options?.oAuth?.persistence,
                             },
-                            deviceCodeCallback: this.options.oAuth.deviceCodeCallback,
+                            deviceCodeCallback: this.options?.oAuth?.deviceCodeCallback,
                             url: this.csp.serviceUri!
                         };
 
