@@ -5,7 +5,7 @@
 ![build](https://img.shields.io/github/actions/workflow/status/primno/dataverse/test.yml)
 ![node-current](https://img.shields.io/node/v/@primno/dataverse-auth)
 
-`@primno/dataverse-auth` is a library for Node.JS to authenticate to Dataverse and Dynamics 365 CE (on-premises).
+`@primno/dataverse-auth` is a library for Node.JS to authenticate to Dataverse / Dynamics 365.
 
 `@primno/dataverse-auth` provides:
 - [Authentication](#authentication) from:
@@ -17,15 +17,17 @@
 - [Persistent token cache](#token-cache-persistence) to avoid re-authenticating.
 - [Authority discovery](#discover-authority)
 
-Works with [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse/client) to make requests to Dataverse / Dynamics 365 CE.
+Works with [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse-client) to make requests to Dataverse / Dynamics 365 CE, but can be used alone, as a **standalone library**.
 
 > This package is part of the [Primno](https://primno.io) framework.
 
 ## Compatibility
 
-`@primno/dataverse-auth` works with Dataverse and Dynamics 365 CE (on-premises).
+`@primno/dataverse-auth` works with Dataverse / Dynamics 365.
 
 Dynamics 365 CE (on-premises) is supported since version 9.0 with CBA/IFD deployment (ADFS 2019+ with OAuth enabled in deployment settings).
+
+> **Tip** If you are using Dynamics 365 App for Outlook on your on-premises environment, the prerequisite are met.
 
 ## Quick start
 
@@ -259,7 +261,7 @@ The token can be persisted using the `persistence` option.
 It is encrypted using `DPAPI` on Windows, `libsecret` on Linux and the `Keychain` on MacOS.
 
 ## Queries
-If you want to query the Dataverse API, you can use [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse/client) package.
+If you want to query the Dataverse API, you can use [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse-client) package.
 
 ## Troubleshooting
 

@@ -9,7 +9,7 @@ dataverse-client is library for Node.JS to make WebAPI requests to Dataverse and
 
 dataverse-client provides a [Query builder](#queries) to build OData queries.
 
-Works with a token provider. Use [`@primno/dataverse-auth`](https://www.npmjs.com/package/@primno/dataverse-auth) to authenticate with Connection String or OAuth2.
+Works with a token provider. Use [`@primno/dataverse-auth`](https://www.npmjs.com/package/@primno/dataverse-auth) to authenticate with a Connection String or OAuth2.
 
 > This package is part of the [Primno](https://primno.io) framework.
 
@@ -26,7 +26,7 @@ dataverse-client works with Dataverse (Dynamics 365 Online) and Dynamics 365 CE 
 
 ### Usage
 
-With connection string authentication:
+With a connection string:
 
 ```ts
 import { DataverseClient } from '@primno/dataverse-client';
@@ -36,12 +36,6 @@ const tokenProvider = new ConnStringTokenProvider(
     "AuthType=OAuth;Url=https://<Environnement>.crm.dynamics.com;UserName=<UserName>;TokenCacheStorePath=./.cache/token.json",
     {
         oAuth: {
-            // For persistent token cache on Linux/Mac to store the token in the keychain.
-            // Only used when TokenCacheStorePath is set.
-            persistence: {
-                serviceName: "<serviceName>", // Optional, default to "Primno.DataverseClient"
-                accountName: "<accountName>" // Optional, default to "MSALCache"
-            },
             // For device code flow
             deviceCodeCallback: (deviceCode) => {
                 console.log(deviceCode.message);
@@ -89,9 +83,11 @@ console.log(accounts);
 ## Authentication
 
 `@primno/dataverse-client` needs a token provider to authenticate with Dataverse.
-Use [`@primno/dataverse-auth`](https://www.npmjs.com/package/@primno/dataverse-auth) to authenticate with Connection String or OAuth2.
+Use [`@primno/dataverse-auth`](https://www.npmjs.com/package/@primno/dataverse-auth) to authenticate with a Connection String or OAuth2.
 
 You can also use your own token provider by implementing the `TokenProvider` interface.
+
+To learn more about available authentication methods, see the `@primno/dataverse-auth` [documentation](https://www.npmjs.com/package/@primno/dataverse-auth).
 
 ## Queries
 
@@ -101,7 +97,7 @@ The following methods are available to query Dataverse:
 - `createRecord`: Creates a record.
 - `updateRecord`: Updates a record by its id.
 - `deleteRecord`: Deletes a record by its id.
-- `executeAction`: Executes an action, function, or workflow.
+- `executeAction`: Executes an action.
 
 Retrieve can be done by providing a `RetrieveMultipleOptions` object or a raw query string.
 
