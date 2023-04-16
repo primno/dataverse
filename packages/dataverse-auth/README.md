@@ -134,6 +134,8 @@ const tokenProvider = new ConnStringTokenProvider(
 | `ClientId` and `ClientSecret` | Client credential |
 | `UserName` only | Device code |
 
+> **Note** Device code flow allows to authenticate with MFA enabled.
+
 Examples:
 
 | Environment | AuthType | OAuth flow | Connection string |
