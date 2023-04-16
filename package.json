@@ -6,7 +6,8 @@
   "repository": "github:primno/dataverse",
   "scripts": {
     "test": "jest",
-    "build": "npm run build -ws"
+    "build": "npm run build -ws",
+    "release": "npm run build && changeset publish"
   },
   "author": "Xavier Monin",
   "license": "MIT",
@@ -15,10 +16,11 @@
     "packages/dataverse-auth"
   ],
   "devDependencies": {
+    "@changesets/cli": "^2.26.1",
     "@types/node": "^18.14.0",
-    "tslib": "^2.5.0",
     "jest": "^29.5.0",
-    "ts-jest": "^29.0.5"
+    "ts-jest": "^29.0.5",
+    "tslib": "^2.5.0"
   },
   "eslintIgnore": [
     "build",
