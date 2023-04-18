@@ -1,4 +1,4 @@
-import { ConfidentialClientApplication, IConfidentialClientApplication, IPublicClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
+import { ConfidentialClientApplication, Configuration, IConfidentialClientApplication, IPublicClientApplication, LogLevel, PublicClientApplication } from "@azure/msal-node";
 import { OAuthConfig } from "../../oauth-configuration";
 import { AxiosNetworkModule } from "../axios-network-module";
 import { getCacheOptions } from "./cache";
@@ -18,9 +18,9 @@ export type Application = PublicApplication | ConfidentialApplication;
 export async function createApplication(oAuthOptions: OAuthConfig): Promise<Application> {
     const { credentials, persistence } = oAuthOptions;
 
-    const options = {
+    const options: Configuration = {
         auth: {
-            clientId: credentials.clientId,
+            clientId: credentials.clientId ?? "51f81489-12ee-4a9e-aaae-a2591f45987d",
             authority: credentials.authorityUrl,
             knownAuthorities: [credentials.authorityUrl]
         },

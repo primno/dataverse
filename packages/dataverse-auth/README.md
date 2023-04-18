@@ -166,9 +166,10 @@ interface OAuthConfig {
          */
         grantType: "client_credential" | "password" | "device_code";
         /**
-         * Client ID
+         * Client ID.
+         * @default "51f81489-12ee-4a9e-aaae-a2591f45987d" (Sample client id)
          */
-        clientId: string;
+        clientId?: string;
         /**
          * Client secret for ConfidentialClientApplication.
          * If set, clientCertificate is not required.
