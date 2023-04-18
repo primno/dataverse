@@ -17,7 +17,7 @@
 - [Persistent token cache](#token-cache-persistence) to avoid re-authenticating.
 - [Authority discovery](#discover-authority)
 
-Works with [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse-client) to make requests to Dataverse / Dynamics 365 CE, but can be used alone, as a **standalone library**.
+Works with [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse-client) to make requests to Dataverse / Dynamics 365 CE, but can be used as a **standalone library**.
 
 > This package is part of the [Primno](https://primno.io) framework.
 
