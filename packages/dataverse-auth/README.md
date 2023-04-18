@@ -17,7 +17,7 @@
 - [Persistent token cache](#token-cache-persistence) to avoid re-authenticating.
 - [Authority discovery](#discover-authority)
 
-Works with [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse-client) to make requests to Dataverse / Dynamics 365 CE, but can be used alone, as a **standalone library**.
+Works with [`@primno/dataverse-client`](https://www.npmjs.com/package/@primno/dataverse-client) to make requests to Dataverse / Dynamics 365 CE, but can be used as a **standalone library**.
 
 > This package is part of the [Primno](https://primno.io) framework.
 
@@ -166,9 +166,10 @@ interface OAuthConfig {
          */
         grantType: "client_credential" | "password" | "device_code";
         /**
-         * Client ID
+         * Client ID.
+         * @default "51f81489-12ee-4a9e-aaae-a2591f45987d" (Sample client id)
          */
-        clientId: string;
+        clientId?: string;
         /**
          * Client secret for ConfidentialClientApplication.
          * If set, clientCertificate is not required.
