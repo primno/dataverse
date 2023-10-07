@@ -1,6 +1,6 @@
 {
   "name": "@primno/dataverse-auth",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Authenticate to Dataverse and Dynamics 365 with a connection string or OAuth 2.0. Provides a token persistence cache.",
   "repository": "github:primno/dataverse",
   "main": "dist/index.cjs.js",
