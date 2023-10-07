@@ -1,5 +1,12 @@
 # @primno/dataverse-auth
 
+## 0.7.0
+
+### Minor Changes
+
+- 4310781: Use @azure/msal-node-extensions. @azure/msal-node-extensions now provides a prebuilt version of DPAPI.
+- a27f4d7: Node v18+ is now required.
+
 ## 0.6.1
 
 ### Patch Changes

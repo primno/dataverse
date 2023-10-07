@@ -1,5 +1,11 @@
 # @primno/dataverse-client
 
+## 0.10.0
+
+### Minor Changes
+
+- a27f4d7: Node v18+ is now required.
+
 ## 0.9.0
 
 ### Minor Changes
