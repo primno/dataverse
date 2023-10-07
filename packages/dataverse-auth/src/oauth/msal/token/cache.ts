@@ -1,6 +1,6 @@
 import { CacheOptions } from "@azure/msal-node";
 import { PersistenceOptionsOn } from "../../oauth-configuration";
-import { DataProtectionScope, IPersistenceConfiguration, PersistenceCachePlugin, PersistenceCreator } from "../extensions";
+import { DataProtectionScope, IPersistenceConfiguration, PersistenceCachePlugin, PersistenceCreator } from "@azure/msal-node-extensions";
 
 export async function getCacheOptions(persistenceOptions: PersistenceOptionsOn): Promise<CacheOptions> {
     const persistenceConfiguration: IPersistenceConfiguration = {
