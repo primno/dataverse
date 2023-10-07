@@ -18,10 +18,10 @@
   "author": "Xavier Monin",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.4.0",
-    "@azure/msal-node": "^1.17.2",
-    "@primno/dpapi": "^1.1.1",
-    "@tediousjs/connection-string": "^0.4.2",
+    "axios": "^1.5.1",
+    "@azure/msal-node": "^1.18.3",
+    "@primno/dpapi": "^1.1.2",
+    "@tediousjs/connection-string": "^0.5.0",
     "keytar": "^7.9.0"
   },
   "devDependencies": {
